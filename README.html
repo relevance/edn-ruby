@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>README.md</title>
+<link rel="stylesheet" type="text/css" media="all" href="/home/crnixon/.emacs.d/vendor/markdown.css"  />
+
+</head>
+
+<body>
+
+<h1 id="edn-ruby">edn-ruby</h1>
+<p><strong>edn-ruby</strong> is a Ruby library to read and write <a href="https://github.com/richhickey/edn">edn</a> (extensible data notation), a subset of Clojure used for transferring data between applications, much like JSON, YAML, or XML.</p>
+<h2 id="installation">Installation</h2>
+<p>Add this line to your application’s Gemfile:</p>
+<pre><code>gem &#39;edn&#39;</code></pre>
+<p>And then execute:</p>
+<pre><code>$ bundle</code></pre>
+<p>Or install it yourself as:</p>
+<pre><code>$ gem install edn</code></pre>
+<h2 id="usage">Usage</h2>
+<p>To read a string of <strong>edn</strong>:</p>
+<pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="dt">EDN</span>.read(<span class="st">&quot;[1 2 {:foo \&quot;bar\&quot;}]&quot;</span>)</code></pre>
+<p>To convert a data structure to an <strong>edn</strong> string:</p>
+<pre class="sourceCode ruby"><code class="sourceCode ruby">data.to_edn</code></pre>
+<p>By default, this will work for strings, symbols, numbers, arrays, hashes, sets, nil, Time, and boolean values.</p>
+<h3 id="tagged-values">Tagged Values</h3>
+<p>The interesting part of <strong>edn</strong> is the <em>extensible</em> part. Data can be be <em>tagged</em> to coerce interpretation of it to a particular data type. An example of a tagged data element:</p>
+<pre><code>#wolf/pack {:alpha &quot;Greybeard&quot; :betas [&quot;Frostpaw&quot; &quot;Blackwind&quot; &quot;Bloodjaw&quot;]}</code></pre>
+<p>The tag (<code>#wolf/pack</code>) will tell any consumers of this data to use a data type registered to handle <code>wolf/pack</code> to represent this data.</p>
+<p>The rules for tags from the <a href="https://github.com/richhickey/edn/blob/master/README.md"><strong>edn</strong> README</a> should be followed. In short, custom tags should have a prefix (the part before the <code>/</code>) designating the user that created them or context they are used in. Non-prefixed tags are reserved for built-in tags.</p>
+<p>There are two tags built in by default: <code>#uuid</code>, used for UUIDs, and <code>#inst</code>, used for an instant in time. In <code>edn-ruby</code>, <code>#inst</code> is converted to a Time, and Time values are tagged as <code>#inst</code>. There is not a UUID data type built into Ruby, so <code>#uuid</code> is converted to a string, but if you require <code>edn/uuid</code>, <code>#uuid</code> values are converted to an instance of <code>EDN::UUID</code>.</p>
+<p>Tags that are not registered are converted as their base data type and a warning will be shown.</p>
+<h3 id="registering-a-new-tag">Registering a New Tag</h3>
+<p>To register a tag for reading, call the method <code>EDN.register</code> with a tag and one of the following:</p>
+<ul>
+<li>A block that accepts data and returns a value.</li>
+<li>A lambda that accepts data and returns a value.</li>
+<li>A class that has an <code>initialize</code> method that accepts data.</li>
+</ul>
+<p>Examples:</p>
+<pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="dt">EDN</span>.register(<span class="st">&quot;clinton/uri&quot;</span>) <span class="kw">do</span> |uri|
+  <span class="dt">URI</span>(uri)
+<span class="kw">end</span>
+
+<span class="dt">EDN</span>.register(<span class="st">&quot;clinton/date&quot;</span>, lambda { |date_array| <span class="dt">Date</span>.new(*date_array) }
+
+<span class="kw">class</span> <span class="dt">Dog</span>
+  <span class="kw">def</span> initialize(name)
+    <span class="ot">@name</span> = name
+  <span class="kw">end</span>
+<span class="kw">end</span>
+
+<span class="dt">EDN</span>.register(<span class="st">&quot;clinton/dog&quot;</span>, <span class="dt">Dog</span>)</code></pre>
+<h2 id="contributing">Contributing</h2>
+<ol style="list-style-type: decimal">
+<li>Fork it</li>
+<li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li>
+<li>Commit your changes (<code>git commit -am 'Added some feature'</code>)</li>
+<li>Push to the branch (<code>git push origin my-new-feature</code>)</li>
+<li>Create new Pull Request</li>
+</ol>
+
+</body>
+</html>
