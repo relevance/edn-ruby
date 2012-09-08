@@ -15,5 +15,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = EDN::VERSION
 
-  gem.add_dependency 'citrus'
+  gem.add_dependency 'treetop', '~> 1.4.10'
+  gem.add_development_dependency 'pry'
 end

@@ -1,0 +1,109 @@
+# TODO
+# - comments and discards
+
+grammar EDNGrammar
+  rule value
+    ws? (tagged_value / base_value) ws?
+  end
+
+  rule tagged_value
+    tag ws base_value
+  end
+
+  rule base_value
+    map /
+    vector /
+    list /
+    set /
+    string /
+    regexp /
+    character /
+    float /
+    integer /
+    keyword /
+    boolean /
+    nil /
+    symbol
+  end
+
+  # Collections
+
+  rule map
+    '{' (value value)* '}'
+  end
+
+  rule set
+    '#{' value* '}'
+  end
+
+  rule vector
+    '[' value* ']'
+  end
+
+  rule list
+    '(' value* ')'
+  end
+
+  # Primitives
+
+  rule regexp
+    '#' string
+  end
+
+  rule string
+    '"' ('\"' / !'"' .)* '"'
+  end
+
+  rule character
+    '\\' ('newline' / 'space' / 'tab' / [^\s,])
+  end
+  
+  rule integer
+    '-'?
+    ('0' / [1-9] [0-9]*)
+    'N'?
+  end
+
+  rule float
+    '-'?
+    ('0' / [1-9] [0-9]*)
+    ('.' [0-9]+)
+    ([eE] [+-]? [0-9]+)?
+    'M'?    
+  end
+
+  rule boolean
+    'true' / 'false'
+  end
+
+  rule nil
+    'nil'
+  end
+
+  rule ke  yword
+    ':' symbol_chars ('/' symbol_chars)?
+  end
+
+  rule symbol
+    (symbol_chars ('/' symbol_chars)? / '/')
+  end
+
+  # Parts
+
+  rule tag
+    '#' symbol_chars ('/' symbol_chars)?
+  end
+
+  rule symbol_chars
+    [\w\*\+\!\?] [\w\.\*\+\!\-\?\:\#]* /
+    [\-\.] (alpha / [\.\*\+!\-_\?\:\#]) [\w\.\*\+!\-\?\:\#]*
+  end
+
+  rule alpha
+    [A-Za-z]
+  end
+
+  rule ws
+    [\s,]+
+  end
+end
