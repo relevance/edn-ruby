@@ -14,4 +14,6 @@ Gem::Specification.new do |gem|
   gem.name          = "edn"
   gem.require_paths = ["lib"]
   gem.version       = EDN::VERSION
+
+  gem.add_dependency 'citrus'
 end

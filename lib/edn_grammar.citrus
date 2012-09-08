@@ -1,0 +1,53 @@
+grammar EDNGrammar
+  rule value
+    tagged_value | base_value
+  end
+
+  rule tagged_value
+    tag ws+ base_value
+  end
+
+  rule base_value
+    map | vector | list | float | integer | keyword
+  end
+
+  rule map
+    '{' ws* (base_value base_value)* '}' ws*
+  end
+
+  rule vector
+    '[' ws* base_value* ']' ws*
+  end
+
+  rule list
+    '(' ws* base_value* ')' ws*
+  end
+
+  rule keyword
+    ':' symbol_chars ('/' symbol_chars)? ws*
+  end
+
+  rule integer
+    '-'? ('0' | [1-9][0-9]*) ws*
+  end
+
+  rule float
+    '-'?
+    ('0' | [1-9][0-9]*)
+    ('.' [0-9]+)
+    ([eE] [+-]? [0-9]+)?
+    ws*
+  end
+
+  rule tag
+    '#' symbol_chars ('/' symbol_chars)?
+  end
+
+  rule symbol_chars
+    /[[[:upper:]][[:lower:]]-_]+/
+  end
+
+  rule ws
+    [ \t\r\n,]
+  end
+end
