@@ -1,109 +1,128 @@
 # TODO
 # - comments and discards
 
-grammar EDNGrammar
-  rule value
-    ws? (tagged_value / base_value) ws?
-  end
+require 'edn/nodes'
 
-  rule tagged_value
-    tag ws base_value
-  end
+module EDN
+  grammar Grammar
+    rule value
+      ws? value:(tagged_value / base_value) ws? <ValueNode>
+    end
 
-  rule base_value
-    map /
-    vector /
-    list /
-    set /
-    string /
-    regexp /
-    character /
-    float /
-    integer /
-    keyword /
-    boolean /
-    nil /
-    symbol
-  end
+    rule values
+      value*
+    end
 
-  # Collections
+    rule pair
+      value value
+    end
 
-  rule map
-    '{' (value value)* '}'
-  end
-
-  rule set
-    '#{' value* '}'
-  end
-
-  rule vector
-    '[' value* ']'
-  end
-
-  rule list
-    '(' value* ')'
-  end
-
-  # Primitives
-
-  rule regexp
-    '#' string
-  end
-
-  rule string
-    '"' ('\"' / !'"' .)* '"'
-  end
-
-  rule character
-    '\\' ('newline' / 'space' / 'tab' / [^\s,])
-  end
+    rule pairs
+      pair*
+    end
+    
+    rule tagged_value
+      tag ws base_value <TaggedValueNode>
+    end
   
-  rule integer
-    '-'?
-    ('0' / [1-9] [0-9]*)
-    'N'?
-  end
+    rule base_value
+      (map /
+       vector /
+       list /
+       set /
+       string /
+       regexp /
+       character /
+       float /
+       integer /
+       keyword /
+       boolean /
+       nil /
+       symbol) <BaseValueNode>
+    end
+  
+    # Collections
+  
+    rule map
+      '{' pairs '}' <MapNode>
+    end
+  
+    rule set
+      '#{' values '}' <SetNode>
+    end
+  
+    rule vector
+      '[' values ']' <VectorNode>
+    end
+  
+    rule list
+      '(' values ')' <ListNode>
+    end
 
-  rule float
-    '-'?
-    ('0' / [1-9] [0-9]*)
-    ('.' [0-9]+)
-    ([eE] [+-]? [0-9]+)?
-    'M'?    
-  end
-
-  rule boolean
-    'true' / 'false'
-  end
-
-  rule nil
-    'nil'
-  end
-
-  rule ke  yword
-    ':' symbol_chars ('/' symbol_chars)?
-  end
-
-  rule symbol
-    (symbol_chars ('/' symbol_chars)? / '/')
-  end
-
-  # Parts
-
-  rule tag
-    '#' symbol_chars ('/' symbol_chars)?
-  end
-
-  rule symbol_chars
-    [\w\*\+\!\?] [\w\.\*\+\!\-\?\:\#]* /
-    [\-\.] (alpha / [\.\*\+!\-_\?\:\#]) [\w\.\*\+!\-\?\:\#]*
-  end
-
-  rule alpha
-    [A-Za-z]
-  end
-
-  rule ws
-    [\s,]+
+    # Primitives
+  
+    rule regexp
+      '#' regexp:string <RegexpNode>
+    end
+  
+    rule string
+      '"' ('\"' / !'"' .)* '"' <StringNode>
+    end
+  
+    rule character
+      '\\' character:('newline' / 'space' / 'tab' / [^\s,]) <CharacterNode>
+    end
+    
+    rule integer
+      '-'?
+      ('0' / [1-9] [0-9]*)
+      'N'?
+      <IntegerNode>
+    end
+  
+    rule float
+      '-'?
+      ('0' / [1-9] [0-9]*)
+      ('.' [0-9]+)
+      ([eE] [+-]? [0-9]+)?
+      'M'?
+      <FloatNode>
+    end
+  
+    rule boolean
+      'true' <BooleanNode> /
+      'false' <BooleanNode>
+    end
+  
+    rule nil
+      'nil' <NilNode>
+    end
+  
+    rule keyword
+      ':' keyword:(symbol_chars ('/' symbol_chars)?) <KeywordNode>
+    end
+  
+    rule symbol
+      (symbol_chars ('/' symbol_chars)? / '/') <SymbolNode>
+    end
+  
+    # Parts
+  
+    rule tag
+      '#' symbol_chars ('/' symbol_chars)?
+    end
+  
+    rule symbol_chars
+      [\w\*\+\!\?] [\w\.\*\+\!\-\?\:\#]* /
+      [\-\.] (alpha / [\.\*\+!\-_\?\:\#]) [\w\.\*\+!\-\?\:\#]*
+    end
+  
+    rule alpha
+      [A-Za-z]
+    end
+  
+    rule ws
+      [\s,]+
+    end
   end
 end
