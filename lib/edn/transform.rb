@@ -11,7 +11,6 @@ module EDN
     rule(:float => simple(:x)) { Float(x) }
 
     rule(:string => simple(:x)) { EDN::StringTransformer.parse_string(x) }
-    rule(:regexp => simple(:x)) { Regexp.new(x) }
     rule(:keyword => simple(:x)) { x.to_sym }
     rule(:symbol => simple(:x)) { EDN::Type::Symbol.new(x) }
     rule(:character => simple(:x)) {

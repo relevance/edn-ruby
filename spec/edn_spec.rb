@@ -15,7 +15,6 @@ describe EDN do
       EDN.read('true').should == true
       EDN.read('false').should == false
       EDN.read('nil').should == nil
-      EDN.read('#"hello"').should == /hello/
       EDN.read('\c').should == "c"
     end
 

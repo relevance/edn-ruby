@@ -48,14 +48,6 @@ describe EDN::Transform do
     end
   end
 
-  context "regexp" do
-    it "should emit a regexp" do
-      regexp = subject.apply(:regexp => 'hello\nworld')
-      regexp.should be_a(Regexp)
-      regexp.should match("hello\nworld")
-    end
-  end
-
   context "character" do
     it "should emit a string" do
       subject.apply(:character => "&").should == "&"

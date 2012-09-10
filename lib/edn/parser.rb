@@ -21,7 +21,6 @@ module EDN
       str('nil').as(:nil) |
       keyword |
       string |
-      regexp |
       character |
       float |
       integer |
@@ -88,10 +87,6 @@ module EDN
       str("\\") >>
       (str('newline') | str('space') | str('tab') |
        match['[:graph:]']).as(:character)
-    }
-
-    rule(:regexp) {
-      str("#") >> string.as(:regexp)
     }
 
     rule(:keyword) {
