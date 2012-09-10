@@ -119,6 +119,19 @@ describe EDN::Transform do
     end
   end
 
-  # TODO
-  # tagged values
+  context "tagged value" do
+    it "should emit the base value if the tag is not registered" do
+      subject.apply(:tagged_value => {
+                      :tag => 'uri', :value => {:string => 'http://google.com'}
+                    }).should == "http://google.com"
+    end
+
+    it "should emit the transformed value if the tag is registered" do
+      EDN.register("uri", lambda { |uri| URI(uri) })
+      subject.apply(:tagged_value => {
+                      :tag => 'uri', :value => {:string => 'http://google.com'}
+                    }).should == URI("http://google.com")
+      EDN.unregister("uri") # cleanup
+    end
+  end
 end

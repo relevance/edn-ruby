@@ -29,7 +29,7 @@ module EDN
     }
 
     rule(:tagged_value) {
-      tag >> space >> base_value.as(:value)
+      (tag >> space >> base_value.as(:value)).as(:tagged_value)
     }
 
     # Collections
