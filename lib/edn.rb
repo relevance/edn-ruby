@@ -31,7 +31,7 @@ module EDN
   end
 
   def self.tag_value(tag, value)
-    func = @tags[tag] || lambda { |data| data }
+    func = @tags[tag] || lambda { |data| {tag => data} }
     func.call(value)
   end
 end
