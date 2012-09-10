@@ -3,7 +3,8 @@ require 'edn/types'
 
 module EDN
   class Transform < Parslet::Transform
-    rule(:boolean => simple(:x)) { x == "true" }
+    rule(:true => simple(:x)) { true }
+    rule(:false => simple(:x)) { false }
     rule(:nil => simple(:x)) { nil }
 
     rule(:integer => simple(:x)) { Integer(x) }

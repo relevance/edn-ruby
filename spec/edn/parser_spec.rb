@@ -23,8 +23,8 @@ describe EDN::Parser do
 
   context "integer" do
     it "should consume integers" do
-      rant(:integer).each do |int|
-        parser.integer.should parse(int.to_s)
+      rant(RantlyHelpers::INTEGER).each do |int|
+        parser.integer.should parse(int)
       end
     end
   end
@@ -32,7 +32,7 @@ describe EDN::Parser do
   context "float" do
     it "should consume simple floats" do
       rant(RantlyHelpers::FLOAT).each do |float|
-        parser.float.should parse(float.to_s)
+        parser.float.should parse(float)
       end
     end
 

@@ -37,8 +37,8 @@ describe EDN::Transform do
 
   context "boolean" do
     it "should emit true or false" do
-      subject.apply(:boolean => "true").should == true
-      subject.apply(:boolean => "false").should == false
+      subject.apply(:true => "true").should == true
+      subject.apply(:false => "false").should == false
     end
   end
 

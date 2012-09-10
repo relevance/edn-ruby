@@ -30,9 +30,11 @@ module RantlyHelpers
     [call(PLAIN_SYMBOL), call(PLAIN_SYMBOL)].join("/")
   }
 
+  INTEGER = lambda { |_| integer.to_s }
+
   STRING = lambda { |_| sized(range(1, 100)) { string.inspect } }
 
-  FLOAT = lambda { |_| float * range(-1000, 1000) }
+  FLOAT = lambda { |_| (float * range(-1000, 1000)).to_s }
 
   FLOAT_WITH_EXP = lambda { |_|
     [float, choose("e", "E", "e+", "E+", "e-", "e+"), positive_integer].
@@ -46,6 +48,10 @@ module RantlyHelpers
       freq([1, [:choose, "newline", "space", "tab"]],
            [5, [:string, :graph]])
     }
+  }
+
+  BOOL_OR_NIL = lambda { |_|
+    choose("true", "false", "nil")
   }
 
   ARRAY = lambda { |_|
@@ -73,17 +79,18 @@ module RantlyHelpers
   }
 
   VALUE = lambda { |_|
-    freq([15, BASIC_VALUE],
+    freq([10, BASIC_VALUE],
          [1, TAGGED_VALUE])
   }
 
   BASIC_VALUE = lambda { |_|
-    branch(:integer,
+    branch(INTEGER,
            FLOAT,
            FLOAT_WITH_EXP,
            STRING,
            SYMBOL,
            CHARACTER,
+           BOOL_OR_NIL,
            VECTOR,
            LIST,
            SET,
