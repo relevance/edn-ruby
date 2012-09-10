@@ -15,8 +15,8 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = EDN::VERSION
 
-  gem.add_dependency 'parslet'
-  gem.add_development_dependency 'pry'
-  gem.add_development_dependency 'rspec'
-  gem.add_development_dependency 'rantly'
+  gem.add_dependency 'parslet', '~> 1.4.0'
+  gem.add_development_dependency 'pry', '~> 0.9.10'
+  gem.add_development_dependency 'rspec', '~> 2.11.0'
+  gem.add_development_dependency 'rantly', '~> 0.3.1'
 end
