@@ -1,10 +1,12 @@
 # edn-ruby
 
+&copy; 2012 Relevance Inc and Clinton N. Dreisbach
+
 **edn-ruby** is a Ruby library to read and write [edn][edn] (extensible data notation), a subset of Clojure used for transferring data between applications, much like JSON, YAML, or XML.
 
 ## Work in Progress
 
-This project is not even alpha -- it is currently being developed. The below README reflects intention, not capability.
+The reader is done. The writer is not yet done. The below README reflects intention, not capability.
 
 ## Installation
 
@@ -25,7 +27,7 @@ Or install it yourself as:
 To read a string of **edn**:
 
 ```ruby
-EDN.read("[1 2 {:foo \"bar\"}]")
+EDN.read('[1 2 {:foo "bar"}]')
 ```
 
 To convert a data structure to an **edn** string:
@@ -36,7 +38,7 @@ data.to_edn
 
 By default, this will work for strings, symbols, numbers, arrays, hashes, sets, nil, Time, and boolean values.
 
-**edn** has some different terminology, and a type that does not map cleanly to Ruby. In **edn**, you have _keywords_, which look like Ruby symbols and have the same meaning and purpose. You also have **edn** _symbols_, which generally reflect variable names, but have several purposes. We parse these and return `EDN::Symbol` values for them, as they are not directly portable into Ruby.
+**edn** has some different terminology, and some types that do not map cleanly to Ruby. In **edn**, you have _keywords_, which look like Ruby symbols and have the same meaning and purpose. You also have **edn** _symbols_, which generally reflect variable names, but have several purposes. We parse these and return `EDN::Type::Symbol` values for them, as they are not directly portable into Ruby. You also have _vectors_, which map to Ruby arrays, and _lists_, which are linked lists in Clojure. We map these to `EDN::Type::List` values, which are type-compatible with arrays.
 
 ### Tagged Values
 
