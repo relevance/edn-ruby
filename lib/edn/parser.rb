@@ -1,21 +1,145 @@
-require 'treetop'
+require 'parslet'
 
 module EDN
-  class Parser
-    Treetop.load(File.join(File.dirname(__FILE__), 'grammar.treetop'))
-    @@parser = EDN::GrammarParser.new
+  class Parser < Parslet::Parser
+    root(:top)
 
-    def parse(data)
-      # Pass the data over to the parser instance
-      tree = @@parser.parse(data)
+    rule(:top) {
+      space? >> value >> space?
+    }
 
-      # If the AST is nil then there was an error during parsing
-      # we need to report a simple error message to help the user.
-      if(tree.nil?)
-        raise Exception, "Parse error at offset: #{@@parser.index}"
-      end
+    rule(:value) {
+      tagged_value | base_value
+    }
 
-      tree
-    end
+    rule(:base_value) {
+      vector |
+      list |
+      set |
+      map |
+      boolean |
+      str('nil').as(:nil) |
+      keyword |
+      string |
+      regexp |
+      character |
+      float |
+      integer |
+      symbol
+    }
+
+    rule(:tagged_value) {
+      tag >> space >> base_value
+    }
+
+    # Collections
+
+    rule(:vector) {
+      str('[') >>
+      top.repeat.as(:vector) >>
+      space? >>
+      str(']')
+    }
+
+    rule(:list) {
+      str('(') >>
+      top.repeat.as(:list) >>
+      space? >>
+      str(')')
+    }
+
+    rule(:set) {
+      str('#{') >>
+      top.repeat.as(:set) >>
+      space? >>
+      str('}')
+    }
+
+    rule(:map) {
+      str('{') >>
+      (top.as(:key) >> top.as(:value)).repeat.as(:map) >>
+      space? >>
+      str('}')
+    }
+
+    # Primitives
+
+    rule(:integer) {
+      (str('-').maybe >>
+       (str('0') | match('[1-9]') >> digit.repeat)).as(:integer) >>
+      str('N').maybe
+    }
+
+    rule(:float) {
+      (str('-').maybe >>
+       (str('0') | (match('[1-9]') >> digit.repeat)) >>
+       str('.') >> digit.repeat(1) >>
+       (match('[eE]') >> match('[\-+]').maybe >> digit.repeat).maybe).as(:float) >>
+      str('M').maybe
+    }
+
+    rule(:string) {
+      str('"') >>
+      (str('\\') >> any | str('"').absent? >> any).repeat.as(:string) >>
+      str('"')
+    }
+
+    rule(:character) {
+      str("\\") >>
+      (str('newline') | str('space') | str('tab') |
+       match['[:graph:]']).as(:character)
+    }
+
+    rule(:regexp) {
+      str("#") >> string.as(:regexp)
+    }
+
+    rule(:keyword) {
+      str(':') >> symbol.as(:keyword)
+    }
+
+    rule(:symbol) {
+      (symbol_chars >> (str('/') >> symbol_chars).maybe |
+       str('/')).as(:symbol)
+    }
+
+    rule(:boolean) {
+      str('true').as(:true) | str('false').as(:false)
+    }
+
+    # Parts
+
+    rule(:tag) {
+      (str('#') >> symbol).as(:tag)
+    }
+
+    rule(:symbol_chars) {
+      (symbol_first_char >>
+       valid_chars.repeat) |
+      match['\-\.']
+    }
+
+    rule(:symbol_first_char) {
+      (match['\-\.'] >> match['0-9'].absent? |
+       match['\#\:0-9'].absent?) >> valid_chars
+    }
+
+    rule(:valid_chars) {
+      match['[:alnum:]'] | sym_punct
+    }
+
+    rule(:sym_punct) {
+      match['\.\*\+\!\-\?\:\#\_']
+    }
+
+    rule(:digit) {
+      match['0-9']
+    }
+
+    rule(:space) {
+      match('[\s,]').repeat(1)
+    }
+
+    rule(:space?) { space.maybe }
   end
 end
