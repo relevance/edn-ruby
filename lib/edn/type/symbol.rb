@@ -12,11 +12,24 @@ module EDN
         to_sym == other.to_sym
       end
 
+      def eql?(other)
+        return false unless other.is_a?(Symbol)
+        to_sym == other.to_sym
+      end
+
+      def hash
+        @symbol.hash
+      end
+
       def to_sym
         @symbol
       end
 
       def to_s
+        @symbol.to_s
+      end
+
+      def to_edn
         @symbol.to_s
       end
     end

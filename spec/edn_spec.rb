@@ -18,6 +18,10 @@ describe EDN do
       EDN.read('\c').should == "c"
     end
 
+    it "reads #inst tagged values" do
+      EDN.read('#inst "2012-09-10T16:16:03-04:00"').should == Time.new(2012, 9, 10, 16, 16, 3, '-04:00')
+    end
+
     it "reads vectors" do
       EDN.read('[]').should == []
       EDN.read('[1]').should == [1]
@@ -49,11 +53,30 @@ describe EDN do
     it "reads any valid value" do
       values = rant(RantlyHelpers::VALUE)
       values.each do |value|
-        if value =~ /^(#.+ )?nil$/
+        if value == "nil"
           EDN.read(value).should be_nil
         else
           EDN.read(value).should_not be_nil
         end
+      end
+    end
+  end
+
+  context "writing" do
+    it "writes any valid value" do
+      values = rant(RantlyHelpers::VALUE)
+      values.each do |value|
+        expect {
+          EDN.read(value).to_edn
+        }.to_not raise_error
+      end
+    end
+
+    it "writes equivalent edn to what it reads" do
+      values = rant(RantlyHelpers::VALUE)
+      values.each do |value|
+        ruby_value = EDN.read(value)
+        ruby_value.should == EDN.read(ruby_value.to_edn)
       end
     end
   end

@@ -1,5 +1,6 @@
 $:.push(File.dirname(__FILE__))
 require "edn/version"
+require "edn/core_ext"
 require "edn/parser"
 require "edn/transform"
 
@@ -31,7 +32,23 @@ module EDN
   end
 
   def self.tag_value(tag, value)
-    func = @tags[tag] || lambda { |data| {tag => data} }
-    func.call(value)
+    func = @tags[tag]
+    if func
+      func.call(value)
+    else
+      EDN::Type::Unknown.new(tag, value)
+    end
   end
+
+  def self.tagout(tag, value)
+    "##{tag} #{value.to_edn}"
+  end
+end
+
+EDN.register("inst") do |value|
+  Time.parse(value)
+end
+
+EDN.register("uuid") do |value|
+  EDN::Type::UUID.new(value)
 end

@@ -18,7 +18,7 @@ module EDN
       when "newline" then "\n"
       when "tab" then "\t"
       when "space" then " "
-      else x
+      else x.to_s
       end
     }
 
@@ -27,9 +27,8 @@ module EDN
     rule(:set => subtree(:array)) { Set.new(array) }
     rule(:map => subtree(:array)) { Hash[array.map { |hash| [hash[:key], hash[:value]] }] }
 
-    rule(:tag => simple(:x)) { x.to_sym }
     rule(:tagged_value => subtree(:x)) {
-      EDN.tag_value(x[:tag], x[:value])
+      EDN.tag_value(x[:tag].to_s, x[:value])
     }
   end
 end

@@ -112,10 +112,10 @@ describe EDN::Transform do
   end
 
   context "tagged value" do
-    it "should emit a generic hash if the tag is not registered" do
+    it "should emit a EDN::Type::Unknown if the tag is not registered" do
       subject.apply(:tagged_value => {
                       :tag => 'uri', :value => {:string => 'http://google.com'}
-                    }).should == {"uri" => "http://google.com"}
+                    }).should == EDN::Type::Unknown.new("uri", "http://google.com")
     end
 
     it "should emit the transformed value if the tag is registered" do

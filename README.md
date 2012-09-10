@@ -64,9 +64,9 @@ The tag (`#wolf/pack`) will tell any consumers of this data to use a data type r
 
 The rules for tags from the [**edn** README][README] should be followed. In short, custom tags should have a prefix (the part before the `/`) designating the user that created them or context they are used in. Non-prefixed tags are reserved for built-in tags.
 
-There are two tags built in by default: `#uuid`, used for UUIDs, and `#inst`, used for an instant in time. In `edn-ruby`, `#inst` is converted to a Time, and Time values are tagged as `#inst`. There is not a UUID data type built into Ruby, so `#uuid` is converted to a string, but if you require `edn/uuid`, `#uuid` values are converted to an instance of `EDN::UUID`.
+There are two tags built in by default: `#uuid`, used for UUIDs, and `#inst`, used for an instant in time. In `edn-ruby`, `#inst` is converted to a Time, and Time values are tagged as `#inst`. There is not a UUID data type built into Ruby, so `#uuid` is converted to an instance of `EDN::Type::UUID`.
 
-Tags that are not registered generate a generic one-element hash that includes the tag as the key and the tagged element as the value.
+Tags that are not registered generate a struct of the type `EDN::Type::Unknown` with the methods `tag` and `value`.
 
 ### Registering a New Tag For Reading
 

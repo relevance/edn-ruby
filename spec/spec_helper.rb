@@ -37,7 +37,8 @@ module RantlyHelpers
   FLOAT = lambda { |_| (float * range(-1000, 1000)).to_s }
 
   FLOAT_WITH_EXP = lambda { |_|
-    [float, choose("e", "E", "e+", "E+", "e-", "e+"), positive_integer].
+    # limited range because of Infinity
+    [float, choose("e", "E", "e+", "E+", "e-", "e+"), range(1, 100)].
     map(&:to_s).
     join("")
   }
