@@ -38,7 +38,19 @@ data.to_edn
 
 By default, this will work for strings, symbols, numbers, arrays, hashes, sets, nil, Time, and boolean values.
 
-**edn** has some different terminology, and some types that do not map cleanly to Ruby. In **edn**, you have _keywords_, which look like Ruby symbols and have the same meaning and purpose. You also have **edn** _symbols_, which generally reflect variable names, but have several purposes. We parse these and return `EDN::Type::Symbol` values for them, as they are not directly portable into Ruby. You also have _vectors_, which map to Ruby arrays, and _lists_, which are linked lists in Clojure. We map these to `EDN::Type::List` values, which are type-compatible with arrays.
+### Value Translations
+
+**edn** has some different terminology, and some types that do not map cleanly to Ruby.
+
+**NOTE**: Comments requested on the following.
+
+In **edn**, you have _keywords_, which look like Ruby symbols and have the same meaning and purpose. These are converted to Ruby symbols. 
+
+You have **edn** _symbols_, which generally reflect variable names, but have several purposes. We parse these and return `EDN::Type::Symbol` values for them, as they are not directly portable into Ruby. 
+
+You have _vectors_, which map to Ruby arrays, and _lists_, which are linked lists in Clojure. We map these to `EDN::Type::List` values, which are type-compatible with arrays.
+
+**edn** has character types, but Ruby does not. These are converted into one-character strings.
 
 ### Tagged Values
 
@@ -54,7 +66,7 @@ The rules for tags from the [**edn** README][README] should be followed. In shor
 
 There are two tags built in by default: `#uuid`, used for UUIDs, and `#inst`, used for an instant in time. In `edn-ruby`, `#inst` is converted to a Time, and Time values are tagged as `#inst`. There is not a UUID data type built into Ruby, so `#uuid` is converted to a string, but if you require `edn/uuid`, `#uuid` values are converted to an instance of `EDN::UUID`.
 
-Tags that are not registered are converted as their base data type and a warning will be shown.
+Tags that are not registered generate a generic one-element hash that includes the tag as the key and the tagged element as the value.
 
 ### Registering a New Tag For Reading
 
