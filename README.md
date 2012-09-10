@@ -4,10 +4,6 @@
 
 **edn-ruby** is a Ruby library to read and write [edn][edn] (extensible data notation), a subset of Clojure used for transferring data between applications, much like JSON, YAML, or XML.
 
-## Work in Progress
-
-The reader is done. The writer is not yet done. The below README reflects intention, not capability.
-
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -125,7 +121,6 @@ This method calls `.to_edn` on the second argument and joins the arguments appro
 3. Commit your changes (`git commit -am 'Added some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
-
 
 [edn]: https://github.com/richhickey/edn
 [README]: https://github.com/richhickey/edn/blob/master/README.md

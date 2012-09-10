@@ -41,7 +41,7 @@ module EDN
   end
 
   def self.tagout(tag, value)
-    "##{tag} #{value.to_edn}"
+    ["##{tag}", value.to_edn].join(" ")
   end
 end
 
