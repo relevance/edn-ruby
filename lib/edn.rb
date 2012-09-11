@@ -46,7 +46,7 @@ module EDN
 end
 
 EDN.register("inst") do |value|
-  Time.parse(value)
+  DateTime.parse(value)
 end
 
 EDN.register("uuid") do |value|

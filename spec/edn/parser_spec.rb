@@ -151,6 +151,14 @@ describe EDN::Parser do
   end
 
   context "tagged value" do
+    context "#inst" do
+      it "should consume #inst" do
+        rant(RantlyHelpers::INST).each do |value|
+          parser.tagged_value.should parse(value)
+        end
+      end
+    end
+
     it "should consume tagged values" do
       rant(RantlyHelpers::TAGGED_VALUE).each do |value|
         parser.tagged_value.should parse(value)

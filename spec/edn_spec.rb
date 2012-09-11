@@ -19,7 +19,7 @@ describe EDN do
     end
 
     it "reads #inst tagged values" do
-      EDN.read('#inst "2012-09-10T16:16:03-04:00"').should == Time.new(2012, 9, 10, 16, 16, 3, '-04:00')
+      EDN.read('#inst "2012-09-10T16:16:03-04:00"').should == DateTime.new(2012, 9, 10, 16, 16, 3, '-04:00')
     end
 
     it "reads vectors" do

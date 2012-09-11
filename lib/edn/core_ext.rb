@@ -44,6 +44,12 @@ module EDN
       end
     end
 
+    module DateTime
+      def to_edn
+        EDN.tagout("inst", self.rfc3339)
+      end
+    end
+
     module Time
       def to_edn
         EDN.tagout("inst", self.xmlschema)
@@ -61,4 +67,5 @@ Symbol.send(:include, EDN::CoreExt::Symbol)
 Array.send(:include, EDN::CoreExt::Array)
 Hash.send(:include, EDN::CoreExt::Hash)
 Set.send(:include, EDN::CoreExt::Set)
+DateTime.send(:include, EDN::CoreExt::DateTime)
 Time.send(:include, EDN::CoreExt::Time)

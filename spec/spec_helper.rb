@@ -12,6 +12,10 @@ end
 
 module RantlyHelpers
 
+  KEYWORD = lambda { |_|
+    call(SYMBOL).to_sym.to_edn
+  }
+
   SYMBOL = lambda { |_|
     branch(PLAIN_SYMBOL, NAMESPACED_SYMBOL)
   }
@@ -30,11 +34,11 @@ module RantlyHelpers
     [call(PLAIN_SYMBOL), call(PLAIN_SYMBOL)].join("/")
   }
 
-  INTEGER = lambda { |_| integer.to_s }
+  INTEGER = lambda { |_| integer.to_edn }
 
-  STRING = lambda { |_| sized(range(1, 100)) { string.inspect } }
+  STRING = lambda { |_| sized(range(1, 100)) { string.to_edn } }
 
-  FLOAT = lambda { |_| (float * range(-1000, 1000)).to_s }
+  FLOAT = lambda { |_| (float * range(-1000, 1000)).to_edn }
 
   FLOAT_WITH_EXP = lambda { |_|
     # limited range because of Infinity
@@ -60,15 +64,15 @@ module RantlyHelpers
   }
 
   VECTOR = lambda { |_|
-    "[" + call(ARRAY).join(" ") + "]"
+    call(ARRAY).to_edn
   }
 
   LIST = lambda { |_|
-    "(" + call(ARRAY).join(" ") + ")"
+    EDN::Type::List.new(*call(ARRAY)).to_edn
   }
 
   SET = lambda { |_|
-    '#{' + call(ARRAY).join(" ") + '}'
+    Set.new(call(ARRAY)).to_edn
   }
 
   MAP = lambda { |_|
@@ -81,6 +85,7 @@ module RantlyHelpers
 
   VALUE = lambda { |_|
     freq([10, BASIC_VALUE],
+         [1, INST],
          [1, TAGGED_VALUE])
   }
 
@@ -89,6 +94,7 @@ module RantlyHelpers
            FLOAT,
            FLOAT_WITH_EXP,
            STRING,
+           KEYWORD,
            SYMBOL,
            CHARACTER,
            BOOL_OR_NIL,
@@ -100,6 +106,10 @@ module RantlyHelpers
 
   TAGGED_VALUE = lambda { |_|
     "#" + [call(SYMBOL), call(BASIC_VALUE)].join(" ")
+  }
+
+  INST = lambda { |_|
+    DateTime.new(range(0, 2500), range(1, 12), range(1, 28), range(0, 23), range(0, 59), range(0, 59), "#{range(-12,12)}").to_edn
   }
 
   def rant(fun, count = REPEAT)
