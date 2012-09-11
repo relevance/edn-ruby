@@ -66,7 +66,7 @@ module EDN
     rule(:integer) {
       (str('-').maybe >>
        (str('0') | match('[1-9]') >> digit.repeat)).as(:integer) >>
-      str('N').maybe
+      str('N').maybe.as(:precision)
     }
 
     rule(:float) {
@@ -74,7 +74,7 @@ module EDN
        (str('0') | (match('[1-9]') >> digit.repeat)) >>
        str('.') >> digit.repeat(1) >>
        (match('[eE]') >> match('[\-+]').maybe >> digit.repeat).maybe).as(:float) >>
-      str('M').maybe
+      str('M').maybe.as(:precision)
     }
 
     rule(:string) {
