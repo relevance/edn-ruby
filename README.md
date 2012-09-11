@@ -1,6 +1,6 @@
 # edn-ruby
 
-&copy; 2012 Relevance Inc and Clinton N. Dreisbach
+&copy; 2012 Relevance Inc
 
 **edn-ruby** is a Ruby library to read and write [edn][edn] (extensible data notation), a subset of Clojure used for transferring data between applications, much like JSON, YAML, or XML.
 
@@ -113,6 +113,10 @@ end
 ```
 
 This method calls `.to_edn` on the second argument and joins the arguments appropriately.
+
+## Contributors
+
+* Clinton N. Dreisbach
 
 ## Contributing
 
