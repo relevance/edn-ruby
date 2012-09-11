@@ -1,5 +1,6 @@
 require 'edn/string_transformer'
 require 'edn/types'
+require 'bigdecimal'
 
 module EDN
   class Transform < Parslet::Transform
@@ -7,8 +8,16 @@ module EDN
     rule(:false => simple(:x)) { false }
     rule(:nil => simple(:x)) { nil }
 
-    rule(:integer => simple(:x)) { Integer(x) }
-    rule(:float => simple(:x)) { Float(x) }
+    rule(:integer => simple(:num), :precision => simple(:n)) {
+      Integer(num)
+    }
+    rule(:float => simple(:num), :precision => simple(:n)) {
+      if n
+        BigDecimal(num)
+      else
+        Float(num)
+      end
+    }
 
     rule(:string => simple(:x)) { EDN::StringTransformer.parse_string(x) }
     rule(:keyword => simple(:x)) { x.to_sym }
