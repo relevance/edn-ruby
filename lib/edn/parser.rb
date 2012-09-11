@@ -28,7 +28,7 @@ module EDN
     }
 
     rule(:tagged_value) {
-      (tag >> space >> base_value.as(:value)).as(:tagged_value)
+      tag >> space >> base_value.as(:value)
     }
 
     # Collections
@@ -105,7 +105,7 @@ module EDN
     # Parts
 
     rule(:tag) {
-      (str('#') >> symbol).as(:tag)
+      str('#') >> symbol.as(:tag)
     }
 
     rule(:symbol_chars) {

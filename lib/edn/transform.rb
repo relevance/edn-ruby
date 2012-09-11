@@ -36,8 +36,8 @@ module EDN
     rule(:set => subtree(:array)) { Set.new(array) }
     rule(:map => subtree(:array)) { Hash[array.map { |hash| [hash[:key], hash[:value]] }] }
 
-    rule(:tagged_value => subtree(:x)) {
-      EDN.tag_value(x[:tag].to_s, x[:value])
+    rule(:tag => simple(:tag), :value => subtree(:value)) {
+      EDN.tag_value(tag.to_s, value)
     }
   end
 end

@@ -117,17 +117,40 @@ describe EDN::Transform do
 
   context "tagged value" do
     it "should emit a EDN::Type::Unknown if the tag is not registered" do
-      subject.apply(:tagged_value => {
-                      :tag => 'uri', :value => {:string => 'http://google.com'}
-                    }).should == EDN::Type::Unknown.new("uri", "http://google.com")
+      subject.apply({:tag => {:symbol => 'uri'}, :value => {:string => 'http://google.com'}}).should == EDN::Type::Unknown.new("uri", "http://google.com")
     end
 
     it "should emit the transformed value if the tag is registered" do
       EDN.register("uri", lambda { |uri| URI(uri) })
-      subject.apply(:tagged_value => {
-                      :tag => 'uri', :value => {:string => 'http://google.com'}
-                    }).should == URI("http://google.com")
+      subject.apply({:tag => {:symbol => 'uri'}, :value => {:string => 'http://google.com'}}).should == URI("http://google.com")
       EDN.unregister("uri") # cleanup
+    end
+
+    it "should work with nested values" do
+      tree = {
+        :tag=>{:symbol=>"cnd/awesome"},
+        :value=>
+        {:vector=>
+          [{:keyword=>{:symbol=>"a"}},
+            {:list=>
+              [{:integer=>"1", :precision=>nil},
+                {:list=>
+                  [{:integer=>"2", :precision=>nil},
+                    {:integer=>"3", :precision=>nil}]}]},
+            {:keyword=>{:symbol=>"b"}},
+            {:keyword=>{:symbol=>"c"}},
+            {:set=>
+              [{:integer=>"1", :precision=>nil},
+                {:integer=>"2", :precision=>nil},
+                {:integer=>"3", :precision=>nil}]},
+            {:vector=>
+              [{:vector=>
+                  [{:vector=>[{:integer=>"42", :precision=>nil}]},
+                    {:integer=>"42", :precision=>nil}]}]}]}}
+      expected = EDN::Type::Unknown.new('cnd/awesome',
+                                    [:a, [1, [2, 3]], :b, :c,
+                                          Set.new([1, 2, 3]), [[[42], 42]]])
+      subject.apply(tree).should == expected
     end
   end
 end
