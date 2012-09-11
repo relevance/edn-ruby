@@ -126,5 +126,5 @@ This method calls `.to_edn` on the second argument and joins the arguments appro
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
-[edn]: https://github.com/richhickey/edn
-[README]: https://github.com/richhickey/edn/blob/master/README.md
+[edn]: https://github.com/edn-format/edn
+[README]: https://github.com/edn-format/edn/blob/master/README.md
