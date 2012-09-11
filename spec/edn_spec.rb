@@ -7,6 +7,7 @@ describe EDN do
     it "reads single values" do
       EDN.read("1").should == 1
       EDN.read("3.14").should == 3.14
+      EDN.read("3.14M").should == BigDecimal("3.14")
       EDN.read('"hello\nworld"').should == "hello\nworld"
       EDN.read(':hello').should == :hello
       EDN.read(':hello/world').should == :"hello/world"

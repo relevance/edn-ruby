@@ -3,13 +3,17 @@ require 'spec_helper'
 describe EDN::Transform do
   context "integer" do
     it "should emit an integer" do
-      subject.apply(:integer => "1").should == 1
+      subject.apply(:integer => "1", :precision => nil).should == 1
     end
   end
 
   context "float" do
     it "should emit an float" do
-      subject.apply(:float => "1.0").should == 1.0
+      subject.apply(:float => "1.0", :precision => nil).should == 1.0
+    end
+
+    it "should emit a BigDecimal if suffixed with M" do
+      subject.apply(:float => "1.0", :precision => "M").should == BigDecimal("1.0")
     end
   end
 
@@ -63,21 +67,21 @@ describe EDN::Transform do
   context "vector" do
     it "should emit an array" do
       subject.apply(:vector => []).should == []
-      subject.apply(:vector => [{:integer => "1"}, {:string => "abc"}]).should == [1, "abc"]
-      subject.apply(:vector => [{:vector => [{:integer => "1"}, {:string => "abc"}]}, {:float => "3.14"}]).should == [[1, "abc"], 3.14]
+      subject.apply(:vector => [{:integer => "1", :precision => nil}, {:string => "abc"}]).should == [1, "abc"]
+      subject.apply(:vector => [{:vector => [{:integer => "1", :precision => nil}, {:string => "abc"}]}, {:float => "3.14", :precision => nil}]).should == [[1, "abc"], 3.14]
     end
   end
 
   context "list" do
     it "should emit a list" do
       subject.apply(:list => []).should == EDN::Type::List.new
-      subject.apply(:list => [{:integer => "1"}, {:string => "abc"}]).should == EDN::Type::List.new(1, "abc")
-      subject.apply(:list => [{:list => [{:integer => "1"}, {:string => "abc"}]}, {:float => "3.14"}]).should == \
+      subject.apply(:list => [{:integer => "1", :precision => nil}, {:string => "abc"}]).should == EDN::Type::List.new(1, "abc")
+      subject.apply(:list => [{:list => [{:integer => "1", :precision => nil}, {:string => "abc"}]}, {:float => "3.14", :precision => nil}]).should == \
         EDN::Type::List.new(EDN::Type::List.new(1, "abc"), 3.14)
     end
 
     it "should be type-compatible with arrays" do
-      subject.apply(:list => [{:integer => "1"}, {:string => "abc"}]).should == [1, "abc"]
+      subject.apply(:list => [{:integer => "1", :precision => nil}, {:string => "abc"}]).should == [1, "abc"]
     end
   end
 
@@ -91,8 +95,8 @@ describe EDN::Transform do
   context "map" do
     it "should emit a hash" do
       map_tree = {:map=>
-        [ {:key=>{:keyword=>{:symbol=>"a"}}, :value=>{:integer=>"1"}},
-          {:key=>{:keyword=>{:symbol=>"b"}}, :value=>{:integer=>"2"}}
+        [ {:key=>{:keyword=>{:symbol=>"a"}}, :value=>{:integer=>"1", :precision => nil}},
+          {:key=>{:keyword=>{:symbol=>"b"}}, :value=>{:integer=>"2", :precision => nil}}
         ]
       }
 
@@ -101,12 +105,12 @@ describe EDN::Transform do
 
     it "should work with nested maps" do
       map_tree = {:map=>
-        [{:key=>{:keyword=>{:symbol=>"a"}}, :value=>{:integer=>"1"}},
-          {:key=>{:keyword=>{:symbol=>"b"}}, :value=>{:integer=>"2"}},
+        [{:key=>{:keyword=>{:symbol=>"a"}}, :value=>{:integer=>"1", :precision => nil}},
+          {:key=>{:keyword=>{:symbol=>"b"}}, :value=>{:integer=>"2", :precision => nil}},
           {:key=>
             {:map=>
-              [{:key=>{:keyword=>{:symbol=>"c"}}, :value=>{:integer=>"3"}}]},
-            :value=>{:integer=>"4"}}]}
+              [{:key=>{:keyword=>{:symbol=>"c"}}, :value=>{:integer=>"3", :precision => nil}}]},
+            :value=>{:integer=>"4", :precision => nil}}]}
       subject.apply(map_tree).should == {:a => 1, :b => 2, {:c => 3} => 4}
     end
   end
