@@ -39,5 +39,11 @@ module EDN
     rule(:tag => simple(:tag), :element => subtree(:element)) {
       EDN.tagged_element(tag.to_s, element)
     }
+
+    rule(:metadata => subtree(:raw_metadata), :element => subtree(:element)) {
+      # Toss metadata for now
+      metadata = Hash[raw_metadata.dup.map { |hash| [hash[:key], hash[:value]] }]
+      element
+    }
   end
 end

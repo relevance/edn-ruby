@@ -121,7 +121,7 @@ module RantlyHelpers
   }
 
   ELEMENT_WITH_METADATA = lambda { |_|
-    [call(METADATA), call(BASIC_ELEMENT)].join(" ")
+    [call(METADATA), branch(SYMBOL, VECTOR, LIST, SET, MAP)].join(" ")
   }
 
 

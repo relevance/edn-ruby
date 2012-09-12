@@ -51,6 +51,10 @@ describe EDN do
       EDN.read('#{1 #{:abc}}').should == Set[1, Set[:abc]]
     end
 
+    it "reads metadata, which does not change the element's identity" do
+      EDN.read('[1 2 3]').should == EDN.read('^{:doc "My vec"} [1 2 3]')
+    end
+
     it "reads any valid element" do
       elements = rant(RantlyHelpers::ELEMENT)
       elements.each do |element|
