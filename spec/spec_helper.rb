@@ -91,7 +91,8 @@ module RantlyHelpers
   }
 
   ELEMENT = lambda { |_|
-    freq([10, BASIC_ELEMENT],
+    freq([8, BASIC_ELEMENT],
+         [2, ELEMENT_WITH_METADATA],
          [1, INST],
          [1, TAGGED_ELEMENT])
   }
@@ -110,6 +111,19 @@ module RantlyHelpers
            SET,
            MAP)
   }
+
+  METADATA = lambda { |_|
+    size = range(1, 4)
+    keys = array(size) { branch(KEYWORD, SYMBOL, STRING) }
+    elements = array(size) { call(ELEMENT) }
+    arrays = keys.zip(elements)
+    '^{' + arrays.map { |array| array.join(" ") }.join(", ") + '}'
+  }
+
+  ELEMENT_WITH_METADATA = lambda { |_|
+    [call(METADATA), call(BASIC_ELEMENT)].join(" ")
+  }
+
 
   TAG = lambda { |_|
     tag = call(SYMBOL)
