@@ -1,19 +1,27 @@
 require 'parslet'
-require 'parslet/ignore'
 
 module EDN
   class Parser < Parslet::Parser
     root(:top)
 
     rule(:top) {
-      space? >> value >> space?
+      space? >> element >> space?
     }
 
-    rule(:value) {
-      tagged_value | base_value
+    rule(:element) {
+      element_without_metadata |
+      (metadata >> space).maybe >> element_without_metadata.as(:element)
     }
 
-    rule(:base_value) {
+    rule(:element_without_metadata) {
+      base_element | tagged_element
+    }
+
+    rule(:tagged_element) {
+      tag >> space? >> base_element.as(:element)
+    }
+
+    rule(:base_element) {
       vector |
       list |
       set |
@@ -28,15 +36,17 @@ module EDN
       symbol
     }
 
-    rule(:tagged_value) {
-      tag >> space? >> base_value.as(:value)
+    rule(:metadata) {
+      str('^{') >>
+      (keyword.as(:key) >> top.as(:value)).repeat.as(:metadata) >>
+      space? >>
+      str('}')
     }
 
     # Collections
 
     rule(:vector) {
       str('[') >>
-      space? >>
       top.repeat.as(:vector) >>
       space? >>
       str(']')
@@ -140,7 +150,7 @@ module EDN
     }
 
     rule(:discard) {
-      str('#_') >> space? >> (tagged_value | base_value).ignore
+      str('#_') >> space? >> (tagged_element | base_element).ignore
     }
 
     rule(:space) {

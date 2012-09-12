@@ -32,17 +32,17 @@ module EDN
     @tags[tag] = nil
   end
 
-  def self.tagged_value(tag, value)
+  def self.tagged_element(tag, element)
     func = @tags[tag]
     if func
-      func.call(value)
+      func.call(element)
     else
-      EDN::Type::Unknown.new(tag, value)
+      EDN::Type::Unknown.new(tag, element)
     end
   end
 
-  def self.tagout(tag, value)
-    ["##{tag}", value.to_edn].join(" ")
+  def self.tagout(tag, element)
+    ["##{tag}", element.to_edn].join(" ")
   end
 
   def self.symbol(text)

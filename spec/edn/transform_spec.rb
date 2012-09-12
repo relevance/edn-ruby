@@ -115,21 +115,21 @@ describe EDN::Transform do
     end
   end
 
-  context "tagged value" do
+  context "tagged element" do
     it "should emit a EDN::Type::Unknown if the tag is not registered" do
-      subject.apply({:tag => {:symbol => 'uri'}, :value => {:string => 'http://google.com'}}).should == EDN::Type::Unknown.new("uri", "http://google.com")
+      subject.apply({:tag => {:symbol => 'uri'}, :element => {:string => 'http://google.com'}}).should == EDN::Type::Unknown.new("uri", "http://google.com")
     end
 
-    it "should emit the transformed value if the tag is registered" do
+    it "should emit the transformed element if the tag is registered" do
       EDN.register("uri", lambda { |uri| URI(uri) })
-      subject.apply({:tag => {:symbol => 'uri'}, :value => {:string => 'http://google.com'}}).should == URI("http://google.com")
+      subject.apply({:tag => {:symbol => 'uri'}, :element => {:string => 'http://google.com'}}).should == URI("http://google.com")
       EDN.unregister("uri") # cleanup
     end
 
-    it "should work with nested values" do
+    it "should work with nested elements" do
       tree = {
         :tag=>{:symbol=>"cnd/awesome"},
-        :value=>
+        :element=>
         {:vector=>
           [{:keyword=>{:symbol=>"a"}},
             {:list=>
