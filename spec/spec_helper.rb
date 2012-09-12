@@ -60,7 +60,7 @@ module RantlyHelpers
   }
 
   ARRAY = lambda { |_|
-    array(range(0, 10)) { call(VALUE) }
+    array(range(0, 10)) { call(ELEMENT) }
   }
 
   VECTOR = lambda { |_|
@@ -77,19 +77,19 @@ module RantlyHelpers
 
   MAP = lambda { |_|
     size = range(0, 10)
-    keys = array(size) { call(VALUE) }
-    values = array(size) { call(VALUE) }
-    arrays = keys.zip(values)
+    keys = array(size) { call(ELEMENT) }
+    elements = array(size) { call(ELEMENT) }
+    arrays = keys.zip(elements)
     '{' + arrays.map { |array| array.join(" ") }.join(", ") + '}'
   }
 
-  VALUE = lambda { |_|
-    freq([10, BASIC_VALUE],
+  ELEMENT = lambda { |_|
+    freq([10, BASIC_ELEMENT],
          [1, INST],
-         [1, TAGGED_VALUE])
+         [1, TAGGED_ELEMENT])
   }
 
-  BASIC_VALUE = lambda { |_|
+  BASIC_ELEMENT = lambda { |_|
     branch(INTEGER,
            FLOAT,
            FLOAT_WITH_EXP,
@@ -104,8 +104,8 @@ module RantlyHelpers
            MAP)
   }
 
-  TAGGED_VALUE = lambda { |_|
-    "#" + [call(SYMBOL), call(BASIC_VALUE)].join(" ")
+  TAGGED_ELEMENT = lambda { |_|
+    "#" + [call(SYMBOL), call(BASIC_ELEMENT)].join(" ")
   }
 
   INST = lambda { |_|

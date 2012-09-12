@@ -31,12 +31,12 @@ module EDN
     @tags[tag] = nil
   end
 
-  def self.tag_value(tag, value)
+  def self.tag_element(tag, element)
     func = @tags[tag]
     if func
-      func.call(value)
+      func.call(element)
     else
-      EDN::Type::Unknown.new(tag, value)
+      EDN::Type::Unknown.new(tag, element)
     end
   end
 
