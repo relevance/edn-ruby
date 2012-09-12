@@ -38,7 +38,7 @@ module EDN
 
     rule(:metadata) {
       str('^{') >>
-      (keyword.as(:key) >> top.as(:value)).repeat.as(:metadata) >>
+      ((keyword | symbol | string).as(:key) >> top.as(:value)).repeat.as(:metadata) >>
       space? >>
       str('}')
     }
