@@ -22,6 +22,10 @@ module EDN
     end
 
     module String
+      def ~@
+        EDN::Type::Symbol.new(self)
+      end
+
       def to_edn
         self.inspect
       end
@@ -34,6 +38,10 @@ module EDN
     end
 
     module Array
+      def ~@
+        EDN::Type::List.new(*self)
+      end
+
       def to_edn
         '[' + self.map(&:to_edn).join(" ") + ']'
       end

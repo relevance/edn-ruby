@@ -42,9 +42,9 @@ By default, this will work for strings, symbols, numbers, arrays, hashes, sets, 
 
 In **edn**, you have _keywords_, which look like Ruby symbols and have the same meaning and purpose. These are converted to Ruby symbols. 
 
-You have **edn** _symbols_, which generally reflect variable names, but have several purposes. We parse these and return `EDN::Type::Symbol` values for them, as they are not directly portable into Ruby. 
+You have **edn** _symbols_, which generally reflect variable names, but have several purposes. We parse these and return `EDN::Type::Symbol` values for them, as they are not directly portable into Ruby. To create an **edn** symbol in Ruby, call `EDN::Type::Symbol.new` or `EDN.symbol` with a string argument, or use the convenience unary operator `~` like so: `~"elf/rings"`.
 
-You have _vectors_, which map to Ruby arrays, and _lists_, which are linked lists in Clojure. We map these to `EDN::Type::List` values, which are type-compatible with arrays.
+You have _vectors_, which map to Ruby arrays, and _lists_, which are linked lists in Clojure. We map these to `EDN::Type::List` values, which are type-compatible with arrays. To create an **edn** list in Ruby, call `EDN::Type::List.new` or `EDN.list` with all arguments to go in the list. If you have an array, you will use the splat operator, like so: `EDN.list(*[1, 2, 3])`. You can also use the `~` unary operator like so: `~[1, 2, 3]`.
 
 **edn** has character types, but Ruby does not. These are converted into one-character strings.
 

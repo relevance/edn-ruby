@@ -11,8 +11,8 @@ describe EDN do
       EDN.read('"hello\nworld"').should == "hello\nworld"
       EDN.read(':hello').should == :hello
       EDN.read(':hello/world').should == :"hello/world"
-      EDN.read('hello').should == EDN::Type::Symbol.new('hello')
-      EDN.read('hello/world').should == EDN::Type::Symbol.new('hello/world')
+      EDN.read('hello').should == ~'hello'
+      EDN.read('hello/world').should == ~'hello/world'
       EDN.read('true').should == true
       EDN.read('false').should == false
       EDN.read('nil').should == nil

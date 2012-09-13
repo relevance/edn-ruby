@@ -1,8 +1,9 @@
 $:.push(File.dirname(__FILE__))
-require "edn/version"
-require "edn/core_ext"
-require "edn/parser"
-require "edn/transform"
+require 'edn/version'
+require 'edn/types'
+require 'edn/core_ext'
+require 'edn/parser'
+require 'edn/transform'
 
 module EDN
   @parser = EDN::Parser.new
@@ -31,7 +32,7 @@ module EDN
     @tags[tag] = nil
   end
 
-  def self.tag_value(tag, value)
+  def self.tagged_value(tag, value)
     func = @tags[tag]
     if func
       func.call(value)
@@ -42,6 +43,14 @@ module EDN
 
   def self.tagout(tag, value)
     ["##{tag}", value.to_edn].join(" ")
+  end
+
+  def self.symbol(text)
+    EDN::Type::Symbol.new(text)
+  end
+
+  def self.list(*values)
+    EDN::Type::List.new(*values)
   end
 end
 

@@ -35,7 +35,7 @@ describe EDN::Transform do
 
   context "symbol" do
     it "should emit an EDN symbol" do
-      subject.apply(:symbol => "test").should == EDN::Type::Symbol.new('test')
+      subject.apply(:symbol => "test").should == ~'test'
     end
   end
 
@@ -74,10 +74,10 @@ describe EDN::Transform do
 
   context "list" do
     it "should emit a list" do
-      subject.apply(:list => []).should == EDN::Type::List.new
-      subject.apply(:list => [{:integer => "1", :precision => nil}, {:string => "abc"}]).should == EDN::Type::List.new(1, "abc")
+      subject.apply(:list => []).should == EDN.list
+      subject.apply(:list => [{:integer => "1", :precision => nil}, {:string => "abc"}]).should == ~[1, "abc"]
       subject.apply(:list => [{:list => [{:integer => "1", :precision => nil}, {:string => "abc"}]}, {:float => "3.14", :precision => nil}]).should == \
-        EDN::Type::List.new(EDN::Type::List.new(1, "abc"), 3.14)
+        ~[~[1, "abc"], 3.14]
     end
 
     it "should be type-compatible with arrays" do
