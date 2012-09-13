@@ -8,6 +8,10 @@ REPEAT = (ENV["REPEAT"] || 100).to_i
 
 RSpec.configure do |c|
   c.fail_fast = true
+  c.filter_run_including :focused => true
+  c.alias_example_to :fit, :focused => true
+  c.treat_symbols_as_metadata_keys_with_true_values = true
+  c.run_all_when_everything_filtered = true
 end
 
 module RantlyHelpers

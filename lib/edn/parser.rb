@@ -131,8 +131,14 @@ module EDN
       match['0-9']
     }
 
+    rule(:newline) { str("\r").maybe >> str("\n") }
+
+    rule(:comment) {
+      str(';') >> (newline.absent? >> any).repeat
+    }
+
     rule(:space) {
-      match('[\s,]').repeat(1)
+      (comment | match['\s,']).repeat(1)
     }
 
     rule(:space?) { space.maybe }

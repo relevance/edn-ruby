@@ -5,9 +5,26 @@ describe EDN::Parser do
 
   let(:parser) { EDN::Parser.new }
 
+  it "can contain comments" do
+    edn = ";; This is some sample data\n[1 2 ;; the first two values\n3]"
+    parser.should parse(edn)
+    parser.parse(edn).should ==
+      {:vector=>[{:integer=>"1", :precision=>nil},
+                 {:integer=>"2", :precision=>nil},
+                 {:integer=>"3", :precision=>nil}]}
+  end
+
   context "value" do
     it "should consume nil" do
       parser.value.should parse("nil")
+    end
+  end
+
+  context "comment" do
+    it "should consume and throw away comments" do
+      comment = "; this is a comment"
+      parser.comment.should parse(comment)
+      parser.comment.parse(comment).should == "; this is a comment"
     end
   end
 
