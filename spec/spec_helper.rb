@@ -46,7 +46,10 @@ module RantlyHelpers
 
   FLOAT_WITH_EXP = lambda { |_|
     # limited range because of Infinity
-    [float, choose("e", "E", "e+", "E+", "e-", "e+"), range(1, 100)].
+    f = float.to_s
+    guard f !~ /[Ee]/
+
+    [f, choose("e", "E", "e+", "E+", "e-", "e+"), range(1, 100)].
     map(&:to_s).
     join("")
   }
@@ -108,8 +111,14 @@ module RantlyHelpers
            MAP)
   }
 
+  TAG = lambda { |_|
+    tag = call(SYMBOL)
+    guard tag =~ /^[A-Za-z]/
+    "##{tag}"
+  }
+
   TAGGED_VALUE = lambda { |_|
-    "#" + [call(SYMBOL), call(BASIC_VALUE)].join(" ")
+    [call(TAG), call(BASIC_VALUE)].join(" ")
   }
 
   INST = lambda { |_|

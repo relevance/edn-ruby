@@ -1,5 +1,30 @@
 require 'parslet'
 
+class IgnoreParslet < Parslet::Atoms::Base
+  def initialize(parslet)
+    @parslet = parslet
+  end
+  def to_s_inner(prec)
+    @parslet.to_s(prec)
+  end
+  def try(source, context)
+    success, value = result = @parslet.try(source, context)
+
+    return succ(nil) if success
+    return result
+  end
+end
+
+module IgnoreDSL
+  def ignore
+    IgnoreParslet.new(self)
+  end
+end
+
+class Parslet::Atoms::Base
+  include IgnoreDSL
+end
+
 module EDN
   class Parser < Parslet::Parser
     root(:top)
@@ -28,13 +53,14 @@ module EDN
     }
 
     rule(:tagged_value) {
-      tag >> space >> base_value.as(:value)
+      tag >> space? >> base_value.as(:value)
     }
 
     # Collections
 
     rule(:vector) {
       str('[') >>
+      space? >>
       top.repeat.as(:vector) >>
       space? >>
       str(']')
@@ -105,7 +131,7 @@ module EDN
     # Parts
 
     rule(:tag) {
-      str('#') >> symbol.as(:tag)
+      str('#') >> match['[:alpha:]'].present? >> symbol.as(:tag)
     }
 
     rule(:symbol_chars) {
@@ -137,8 +163,12 @@ module EDN
       str(';') >> (newline.absent? >> any).repeat
     }
 
+    rule(:discard) {
+      str('#_') >> space? >> (tagged_value | base_value).ignore
+    }
+
     rule(:space) {
-      (comment | match['\s,']).repeat(1)
+      (discard | comment | match['\s,']).repeat(1)
     }
 
     rule(:space?) { space.maybe }

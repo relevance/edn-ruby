@@ -14,6 +14,15 @@ describe EDN::Parser do
                  {:integer=>"3", :precision=>nil}]}
   end
 
+  it "can discard using the discard reader macro" do
+    edn = "[1 2 #_3 {:foo #_bar baz}]"
+    parser.should parse(edn)
+    parser.parse(edn).should ==
+      {:vector=>[{:integer=>"1", :precision=>nil},
+                 {:integer=>"2", :precision=>nil},
+                 {:map => [{:key=>{:keyword=>{:symbol=>"foo"}}, :value=>{:symbol=>"baz"}}]}]}
+  end
+
   context "value" do
     it "should consume nil" do
       parser.value.should parse("nil")
@@ -92,8 +101,8 @@ describe EDN::Parser do
 
   context "tag" do
     it "should consume any tags" do
-      rant(RantlyHelpers::SYMBOL).each do |symbol|
-        parser.tag.should parse("##{symbol}")
+      rant(RantlyHelpers::TAG).each do |tag|
+        parser.tag.should parse(tag)
       end
     end
   end
