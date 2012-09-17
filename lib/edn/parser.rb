@@ -1,29 +1,5 @@
 require 'parslet'
-
-class IgnoreParslet < Parslet::Atoms::Base
-  def initialize(parslet)
-    @parslet = parslet
-  end
-  def to_s_inner(prec)
-    @parslet.to_s(prec)
-  end
-  def try(source, context)
-    success, value = result = @parslet.try(source, context)
-
-    return succ(nil) if success
-    return result
-  end
-end
-
-module IgnoreDSL
-  def ignore
-    IgnoreParslet.new(self)
-  end
-end
-
-class Parslet::Atoms::Base
-  include IgnoreDSL
-end
+require 'parslet/ignore'
 
 module EDN
   class Parser < Parslet::Parser
@@ -90,13 +66,13 @@ module EDN
     # Primitives
 
     rule(:integer) {
-      (str('-').maybe >>
+      (match['\-\+'].maybe >>
        (str('0') | match('[1-9]') >> digit.repeat)).as(:integer) >>
       str('N').maybe.as(:precision)
     }
 
     rule(:float) {
-      (str('-').maybe >>
+      (match['\-\+'].maybe >>
        (str('0') | (match('[1-9]') >> digit.repeat)) >>
        str('.') >> digit.repeat(1) >>
        (match('[eE]') >> match('[\-+]').maybe >> digit.repeat).maybe).as(:float) >>
@@ -111,7 +87,7 @@ module EDN
 
     rule(:character) {
       str("\\") >>
-      (str('newline') | str('space') | str('tab') |
+      (str('newline') | str('space') | str('tab') | str('return') |
        match['[:graph:]']).as(:character)
     }
 
@@ -137,11 +113,11 @@ module EDN
     rule(:symbol_chars) {
       (symbol_first_char >>
        valid_chars.repeat) |
-      match['\-\.']
+      match['\-\+\.']
     }
 
     rule(:symbol_first_char) {
-      (match['\-\.'] >> match['0-9'].absent? |
+      (match['\-\+\.'] >> match['0-9'].absent? |
        match['\#\:0-9'].absent?) >> valid_chars
     }
 
@@ -150,7 +126,7 @@ module EDN
     }
 
     rule(:sym_punct) {
-      match['\.\*\+\!\-\?\:\#\_']
+      match['\.\*\+\!\-\?\$_%&=:#']
     }
 
     rule(:digit) {

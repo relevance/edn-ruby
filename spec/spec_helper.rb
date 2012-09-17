@@ -26,9 +26,10 @@ module RantlyHelpers
 
   PLAIN_SYMBOL = lambda { |_|
     sized(range(1, 100)) {
-      s = string(/[[:alnum:]]|[\-\.\.\*\+\!\-\?\:\#\_]/)
-      guard s =~ /^[A-Za-z\-\.\.\*\+\!\-\?\:\#\_]/
-      guard s !~ /^[\-\.][0-9]/
+      s = string(/[[:alnum:]]|[\.\*\+\!\-\?\$_%&=:#]/)
+#      guard s =~ /^[A-Za-z\.\*\+\!\-\?\$_%&=:#]/
+      guard s !~ /^[0-9]/
+      guard s !~ /^[\+\-\.][0-9]/
       guard s !~ /^[\:\#]/
       s
     }
@@ -122,7 +123,11 @@ module RantlyHelpers
   }
 
   INST = lambda { |_|
-    DateTime.new(range(0, 2500), range(1, 12), range(1, 28), range(0, 23), range(0, 59), range(0, 59), "#{range(-12,12)}").to_edn
+    begin
+      DateTime.new(range(0, 2500), range(1, 12), range(1, 28), range(0, 23), range(0, 59), range(0, 59), "#{range(-12,12)}").to_edn
+    rescue ArgumentError
+      guard false
+    end
   }
 
   def rant(fun, count = REPEAT)

@@ -54,10 +54,15 @@ describe EDN do
     it "reads any valid value" do
       values = rant(RantlyHelpers::VALUE)
       values.each do |value|
-        if value == "nil"
-          EDN.read(value).should be_nil
-        else
-          EDN.read(value).should_not be_nil
+        begin
+          if value == "nil"
+            EDN.read(value).should be_nil
+          else
+            EDN.read(value).should_not be_nil
+          end
+        rescue Exception => ex
+          puts "Bad value: #{value}"
+          raise ex
         end
       end
     end
@@ -68,7 +73,12 @@ describe EDN do
       values = rant(RantlyHelpers::VALUE)
       values.each do |value|
         expect {
-          EDN.read(value).to_edn
+          begin
+            EDN.read(value).to_edn
+          rescue Exception => ex
+            puts "Bad value: #{value}"
+            raise ex
+          end
         }.to_not raise_error
       end
     end

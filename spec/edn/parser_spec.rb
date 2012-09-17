@@ -53,6 +53,12 @@ describe EDN::Parser do
         parser.integer.should parse(int)
       end
     end
+
+    it "should consume integers prefixed with a +" do
+      rant(RantlyHelpers::INTEGER).each do |int|
+        parser.integer.should parse("+#{int.to_i.abs.to_s}")
+      end
+    end
   end
 
   context "float" do
@@ -65,6 +71,12 @@ describe EDN::Parser do
     it "should consume floats with exponents" do
       rant(RantlyHelpers::FLOAT_WITH_EXP).each do |float|
         parser.float.should parse(float)
+      end
+    end
+
+    it "should consume floats prefixed with a +" do
+      rant(RantlyHelpers::FLOAT).each do |float|
+        parser.float.should parse("+#{float.to_f.abs.to_s}")
       end
     end
   end
