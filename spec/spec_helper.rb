@@ -124,7 +124,6 @@ module RantlyHelpers
     [call(METADATA), branch(SYMBOL, VECTOR, LIST, SET, MAP)].join(" ")
   }
 
-
   TAG = lambda { |_|
     tag = call(SYMBOL)
     guard tag =~ /^[A-Za-z]/
