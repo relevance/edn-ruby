@@ -43,7 +43,13 @@ module EDN
     }
 
     rule(:metadata => subtree(:raw_metadata), :element => subtree(:element)) {
-      metadata = Hash[raw_metadata.map { |hash| [hash[:key], hash[:value]] }]
+      metadata = raw_metadata.reduce({}) do |acc, m|
+        case m
+        when Symbol then acc.merge(m => true)
+        when EDN::Type::Symbol then acc.merge(:tag => m)
+        else acc.merge(m)
+        end
+      end
       element.extend EDN::Metadata
       element.metadata = metadata
       element

@@ -12,7 +12,7 @@ module EDN
     rule(:element) {
       base_element |
       tagged_element |
-      (metadata >> space).maybe >> metadata_capable_element.as(:element)
+      metadata.maybe >> metadata_capable_element.as(:element)
     }
 
     rule(:metadata_capable_element) {
@@ -40,13 +40,6 @@ module EDN
       float |
       integer |
       symbol
-    }
-
-    rule(:metadata) {
-      str('^{') >>
-      ((keyword | symbol | string).as(:key) >> top.as(:value)).repeat.as(:metadata) >>
-      space? >>
-      str('}')
     }
 
     # Collections
@@ -121,6 +114,25 @@ module EDN
     }
 
     # Parts
+
+    rule(:metadata) {
+      ((metadata_map | metadata_symbol | metadata_keyword) >> space?).repeat.as(:metadata)
+    }
+
+    rule(:metadata_map) {
+      str('^{') >>
+      ((keyword | symbol | string).as(:key) >> top.as(:value)).repeat.as(:map) >>
+      space? >>
+      str('}')
+    }
+
+    rule(:metadata_symbol) {
+      str('^') >> symbol
+    }
+
+    rule(:metadata_keyword) {
+      str('^') >> keyword
+    }
 
     rule(:tag) {
       str('#') >> match['[:alpha:]'].present? >> symbol.as(:tag)

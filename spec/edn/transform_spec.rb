@@ -158,8 +158,10 @@ describe EDN::Transform do
     it "should tag the element with metadata" do
       tree = {
         :metadata =>
-        [{:key=>{:keyword=>{:symbol=>"a"}}, :value=>{:integer=>"1", :precision => nil}},
-          {:key=>{:keyword=>{:symbol=>"b"}}, :value=>{:integer=>"2", :precision => nil}}],
+          [:map =>
+            [
+              {:key=>{:keyword=>{:symbol=>"a"}}, :value=>{:integer=>"1", :precision => nil}},
+              {:key=>{:keyword=>{:symbol=>"b"}}, :value=>{:integer=>"2", :precision => nil}}]],
         :element => {:vector => [{:integer => "1", :precision => nil}, {:string => "abc"}]}}
 
       element = subject.apply(tree)

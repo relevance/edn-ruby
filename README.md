@@ -119,11 +119,13 @@ This method calls `.to_edn` on the second argument and joins the arguments appro
 * tags and metadata do not work together
 * metadata keys can be symbols, keywords, or strings
 * only collections and symbols can have metadata
-
-* TODO: special metadata. These do stack
+* special metadata
 
     ^foo => ^{:tag foo}
     ^:foo => ^{:foo true}
+    
+* multiple metadata stack    
+* TODO write up good notes about metadata
 
 
 ## Contributors
