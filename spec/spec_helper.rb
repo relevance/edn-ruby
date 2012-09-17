@@ -67,19 +67,19 @@ module RantlyHelpers
   }
 
   ARRAY = lambda { |_|
-    array(range(0, 10)) { call(ELEMENT) }
+    array(range(1, 10)) { call(ELEMENT) }
   }
 
   VECTOR = lambda { |_|
-    call(ARRAY).to_edn
+    '[' + call(ARRAY).join(', ') + ']'
   }
 
   LIST = lambda { |_|
-    EDN::Type::List.new(*call(ARRAY)).to_edn
+    '(' + call(ARRAY).join(', ') + ')'
   }
 
   SET = lambda { |_|
-    Set.new(call(ARRAY)).to_edn
+    '#{' + call(ARRAY).join(', ') + '}'
   }
 
   MAP = lambda { |_|

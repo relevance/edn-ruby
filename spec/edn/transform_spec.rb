@@ -153,4 +153,18 @@ describe EDN::Transform do
       subject.apply(tree).should == expected
     end
   end
+
+  context "element with metadata" do
+    it "should tag the element with metadata" do
+      tree = {
+        :metadata =>
+        [{:key=>{:keyword=>{:symbol=>"a"}}, :value=>{:integer=>"1", :precision => nil}},
+          {:key=>{:keyword=>{:symbol=>"b"}}, :value=>{:integer=>"2", :precision => nil}}],
+        :element => {:vector => [{:integer => "1", :precision => nil}, {:string => "abc"}]}}
+
+      element = subject.apply(tree)
+      element.should == [1, "abc"]
+      element.metadata.should == {:a => 1, :b => 2}
+    end
+  end
 end

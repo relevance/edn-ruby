@@ -51,8 +51,13 @@ describe EDN do
       EDN.read('#{1 #{:abc}}').should == Set[1, Set[:abc]]
     end
 
-    it "reads metadata, which does not change the element's identity" do
+    it "reads metadata, which does not change the element's equality" do
       EDN.read('[1 2 3]').should == EDN.read('^{:doc "My vec"} [1 2 3]')
+    end
+
+    it "writes metadata" do
+      element = EDN.read('^{:doc "My vec"} [1 2 3]')
+      element.to_edn.should == '^{:doc "My vec"} [1 2 3]'
     end
 
     it "reads any valid element" do
@@ -87,11 +92,14 @@ describe EDN do
       end
     end
 
-    it "writes equivalent edn to what it reads" do
+    it "writes equivalent edn to what it reads", :focused do
       elements = rant(RantlyHelpers::ELEMENT)
       elements.each do |element|
         ruby_element = EDN.read(element)
         ruby_element.should == EDN.read(ruby_element.to_edn)
+        if ruby_element.respond_to?(:metadata)
+          ruby_element.metadata.should == EDN.read(ruby_element.to_edn).metadata
+        end
       end
     end
   end

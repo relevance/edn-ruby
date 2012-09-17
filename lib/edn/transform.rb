@@ -1,5 +1,6 @@
 require 'edn/string_transformer'
 require 'edn/types'
+require 'edn/metadata'
 require 'bigdecimal'
 
 module EDN
@@ -25,6 +26,7 @@ module EDN
     rule(:character => simple(:x)) {
       case x
       when "newline" then "\n"
+      when "return" then "\r"
       when "tab" then "\t"
       when "space" then " "
       else x.to_s
@@ -41,8 +43,9 @@ module EDN
     }
 
     rule(:metadata => subtree(:raw_metadata), :element => subtree(:element)) {
-      # Toss metadata for now
-      metadata = Hash[raw_metadata.dup.map { |hash| [hash[:key], hash[:value]] }]
+      metadata = Hash[raw_metadata.map { |hash| [hash[:key], hash[:value]] }]
+      element.extend EDN::Metadata
+      element.metadata = metadata
       element
     }
   end
