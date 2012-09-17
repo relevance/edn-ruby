@@ -1,4 +1,5 @@
 require 'parslet'
+require 'parslet/ignore'
 
 module EDN
   class Parser < Parslet::Parser

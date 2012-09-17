@@ -132,7 +132,7 @@ module RantlyHelpers
   }
 
   TAGGED_ELEMENT = lambda { |_|
-    "#" + [call(SYMBOL), call(BASIC_ELEMENT)].join(" ")
+    [call(TAG), call(BASIC_ELEMENT)].join(" ")
   }
 
   INST = lambda { |_|
