@@ -92,7 +92,7 @@ describe EDN do
       end
     end
 
-    it "writes equivalent edn to what it reads", :focused do
+    it "writes equivalent edn to what it reads" do
       elements = rant(RantlyHelpers::ELEMENT)
       elements.each do |element|
         ruby_element = EDN.read(element)

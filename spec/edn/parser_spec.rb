@@ -29,7 +29,7 @@ describe EDN::Parser do
     end
 
     it "should consume metadata with the element" do
-      parser.element.should parse('^{:doc "test"} #foo [1 2]')
+      parser.element.should parse('^{:doc "test"} [1 2]')
     end
   end
 

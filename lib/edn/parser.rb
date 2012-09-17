@@ -10,12 +10,17 @@ module EDN
     }
 
     rule(:element) {
-      element_without_metadata |
-      (metadata >> space).maybe >> element_without_metadata.as(:element)
+      base_element |
+      tagged_element |
+      (metadata >> space).maybe >> metadata_capable_element.as(:element)
     }
 
-    rule(:element_without_metadata) {
-      base_element | tagged_element
+    rule(:metadata_capable_element) {
+      vector |
+      list |
+      set |
+      map |
+      symbol
     }
 
     rule(:tagged_element) {

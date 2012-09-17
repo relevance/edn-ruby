@@ -4,19 +4,6 @@
 
 **edn-ruby** is a Ruby library to read and write [edn][edn] (extensible data notation), a subset of Clojure used for transferring data between applications, much like JSON, YAML, or XML.
 
-## Metadata
-
-tags and metadata do not work together
-
-metadata keys can be symbols, keywords, or strings
-
-only collections and symbols can have metadata
-
-^foo => ^{:tag foo}
-^:foo => ^{:foo true}
-These do stack.
-
-
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -126,6 +113,18 @@ end
 ```
 
 This method calls `.to_edn` on the second argument and joins the arguments appropriately.
+
+## Metadata
+
+* tags and metadata do not work together
+* metadata keys can be symbols, keywords, or strings
+* only collections and symbols can have metadata
+
+* TODO: special metadata. These do stack
+
+    ^foo => ^{:tag foo}
+    ^:foo => ^{:foo true}
+
 
 ## Contributors
 
