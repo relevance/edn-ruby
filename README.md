@@ -116,17 +116,18 @@ This method calls `.to_edn` on the second argument and joins the arguments appro
 
 ## Metadata
 
-* tags and metadata do not work together
-* metadata keys can be symbols, keywords, or strings
-* only collections and symbols can have metadata
-* special metadata
+Certain elements of **edn** can have *metadata*. Metadata is a map of values about the element, which must follow specific rules.
 
-    ^foo => ^{:tag foo}
-    ^:foo => ^{:foo true}
-    
-* multiple metadata stack    
-* TODO write up good notes about metadata
+* Only symbols, lists, vectors, maps, and sets can have metadata. Tagged elements *cannot* have metadata.
+* Metadata keys must be symbols, keywords, or strings.
 
+Metadata can be expressed in one of the following three ways:
+
+* Via a map. The element is prefixed with a map which has a caret (`^`) prefixed to it, like so: `^{:doc "This is my vector" :rel :temps} [98.6 99.7]`.
+* Via a keyword. The element is prefixed with a keyword, also prefixed by a caret: `^:awesome #{1 2 \c}`. This results in the key `:awesome` being set to `true`, as if the metadata was: `^{:awesome true} #{1 2 \c}`.
+* Via a symbol. The element is prefixed with a symbol, also prefixed by a caret: `^Boolean "true"`. This results in the key `:tag` being set to the symbol, as if the metadata was: `^{:tag Boolean} "true"`. This is used in Clojure to indicate the Java type of the element. In other **edn** implementations, it may be ignored or used differently.
+
+More than one piece of metadata can be applied to an element. Metadata is applied to the next element appearing after it, so in the case of `^:foo ^{:bar false} [1 2]`, the metadata would be, in total, `^{:foo true, :bar false}`. Note that `^:foo` is applied to the element `[1 2]` with the metadata `^{:bar false}` applied to it. Because of this, key collisions are resolved *right-to-left*.
 
 ## Contributors
 
