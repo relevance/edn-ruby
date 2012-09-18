@@ -55,6 +55,12 @@ describe EDN do
       EDN.read('[1 2 3]').should == EDN.read('^{:doc "My vec"} [1 2 3]')
     end
 
+    it "reads metadata recursively from right to left" do
+      element = EDN.read('^String ^:foo ^{:foo false :tag Boolean :bar 2} [1 2]')
+      element.should == [1, 2]
+      element.metadata.should == {:tag => ~"String", :foo => true, :bar => 2}
+    end
+
     it "writes metadata" do
       element = EDN.read('^{:doc "My vec"} [1 2 3]')
       element.to_edn.should == '^{:doc "My vec"} [1 2 3]'

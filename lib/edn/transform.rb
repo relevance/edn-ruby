@@ -43,7 +43,7 @@ module EDN
     }
 
     rule(:metadata => subtree(:raw_metadata), :element => subtree(:element)) {
-      metadata = raw_metadata.reduce({}) do |acc, m|
+      metadata = raw_metadata.reverse.reduce({}) do |acc, m|
         case m
         when Symbol then acc.merge(m => true)
         when EDN::Type::Symbol then acc.merge(:tag => m)
