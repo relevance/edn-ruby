@@ -57,7 +57,7 @@ module RantlyHelpers
   CHARACTER = lambda { |_|
     "\\" +
     sized(1) {
-      freq([1, [:choose, "newline", "space", "tab"]],
+      freq([1, [:choose, "newline", "return", "space", "tab"]],
            [5, [:string, :graph]])
     }
   }
