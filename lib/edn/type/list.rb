@@ -1,5 +1,7 @@
 module EDN
   module Type
+    include EDN::CoreExt::AllowsMetadata
+
     class List < ::Array
       def self.new(*values)
         self.[](*values)

@@ -10,6 +10,12 @@ module EDN
       end
     end
 
+    module AllowsMetadata
+      def allows_metadata?
+        true
+      end
+    end
+
     module Bignum
       def to_edn
         self.to_s + 'M'
@@ -93,3 +99,7 @@ Hash.send(:include, EDN::CoreExt::Hash)
 Set.send(:include, EDN::CoreExt::Set)
 DateTime.send(:include, EDN::CoreExt::DateTime)
 Time.send(:include, EDN::CoreExt::Time)
+
+[Array, Hash, Set].each do |klass|
+  klass.send(:include, EDN::CoreExt::AllowsMetadata)
+end

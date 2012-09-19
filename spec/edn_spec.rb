@@ -4,22 +4,22 @@ describe EDN do
   include RantlyHelpers
 
   context "#read" do
-    it "reads single values" do
+    it "reads single elements" do
       EDN.read("1").should == 1
       EDN.read("3.14").should == 3.14
       EDN.read("3.14M").should == BigDecimal("3.14")
       EDN.read('"hello\nworld"').should == "hello\nworld"
       EDN.read(':hello').should == :hello
       EDN.read(':hello/world').should == :"hello/world"
-      EDN.read('hello').should == ~'hello'
-      EDN.read('hello/world').should == ~'hello/world'
+      EDN.read('hello').should == EDN::Type::Symbol.new('hello')
+      EDN.read('hello/world').should == EDN::Type::Symbol.new('hello/world')
       EDN.read('true').should == true
       EDN.read('false').should == false
       EDN.read('nil').should == nil
       EDN.read('\c').should == "c"
     end
 
-    it "reads #inst tagged values" do
+    it "reads #inst tagged elements" do
       EDN.read('#inst "2012-09-10T16:16:03-04:00"').should == DateTime.new(2012, 9, 10, 16, 16, 3, '-04:00')
     end
 
@@ -51,17 +51,17 @@ describe EDN do
       EDN.read('#{1 #{:abc}}').should == Set[1, Set[:abc]]
     end
 
-    it "reads any valid value" do
-      values = rant(RantlyHelpers::VALUE)
-      values.each do |value|
+    it "reads any valid element" do
+      elements = rant(RantlyHelpers::ELEMENT)
+      elements.each do |element|
         begin
-          if value == "nil"
-            EDN.read(value).should be_nil
+          if element == "nil"
+            EDN.read(element).should be_nil
           else
-            EDN.read(value).should_not be_nil
+            EDN.read(element).should_not be_nil
           end
         rescue Exception => ex
-          puts "Bad value: #{value}"
+          puts "Bad element: #{element}"
           raise ex
         end
       end
@@ -69,14 +69,14 @@ describe EDN do
   end
 
   context "writing" do
-    it "writes any valid value" do
-      values = rant(RantlyHelpers::VALUE)
-      values.each do |value|
+    it "writes any valid element" do
+      elements = rant(RantlyHelpers::ELEMENT)
+      elements.each do |element|
         expect {
           begin
-            EDN.read(value).to_edn
+            EDN.read(element).to_edn
           rescue Exception => ex
-            puts "Bad value: #{value}"
+            puts "Bad element: #{element}"
             raise ex
           end
         }.to_not raise_error
@@ -84,10 +84,13 @@ describe EDN do
     end
 
     it "writes equivalent edn to what it reads" do
-      values = rant(RantlyHelpers::VALUE)
-      values.each do |value|
-        ruby_value = EDN.read(value)
-        ruby_value.should == EDN.read(ruby_value.to_edn)
+      elements = rant(RantlyHelpers::ELEMENT)
+      elements.each do |element|
+        ruby_element = EDN.read(element)
+        ruby_element.should == EDN.read(ruby_element.to_edn)
+        if ruby_element.respond_to?(:metadata)
+          ruby_element.metadata.should == EDN.read(ruby_element.to_edn).metadata
+        end
       end
     end
   end

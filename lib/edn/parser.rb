@@ -6,14 +6,28 @@ module EDN
     root(:top)
 
     rule(:top) {
-      space? >> value >> space?
+      space? >> element >> space?
     }
 
-    rule(:value) {
-      tagged_value | base_value
+    rule(:element) {
+      base_element |
+      tagged_element |
+      metadata.maybe >> metadata_capable_element.as(:element)
     }
 
-    rule(:base_value) {
+    rule(:metadata_capable_element) {
+      vector |
+      list |
+      set |
+      map |
+      symbol
+    }
+
+    rule(:tagged_element) {
+      tag >> space? >> base_element.as(:element)
+    }
+
+    rule(:base_element) {
       vector |
       list |
       set |
@@ -28,15 +42,10 @@ module EDN
       symbol
     }
 
-    rule(:tagged_value) {
-      tag >> space? >> base_value.as(:value)
-    }
-
     # Collections
 
     rule(:vector) {
       str('[') >>
-      space? >>
       top.repeat.as(:vector) >>
       space? >>
       str(']')
@@ -106,6 +115,25 @@ module EDN
 
     # Parts
 
+    rule(:metadata) {
+      ((metadata_map | metadata_symbol | metadata_keyword) >> space?).repeat.as(:metadata)
+    }
+
+    rule(:metadata_map) {
+      str('^{') >>
+      ((keyword | symbol | string).as(:key) >> top.as(:value)).repeat.as(:map) >>
+      space? >>
+      str('}')
+    }
+
+    rule(:metadata_symbol) {
+      str('^') >> symbol
+    }
+
+    rule(:metadata_keyword) {
+      str('^') >> keyword
+    }
+
     rule(:tag) {
       str('#') >> match['[:alpha:]'].present? >> symbol.as(:tag)
     }
@@ -140,7 +168,7 @@ module EDN
     }
 
     rule(:discard) {
-      str('#_') >> space? >> (tagged_value | base_value).ignore
+      str('#_') >> space? >> (tagged_element | base_element).ignore
     }
 
     rule(:space) {

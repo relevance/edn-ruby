@@ -23,9 +23,13 @@ describe EDN::Parser do
                  {:map => [{:key=>{:keyword=>{:symbol=>"foo"}}, :value=>{:symbol=>"baz"}}]}]}
   end
 
-  context "value" do
+  context "element" do
     it "should consume nil" do
-      parser.value.should parse("nil")
+      parser.element.should parse("nil")
+    end
+
+    it "should consume metadata with the element" do
+      parser.element.should parse('^{:doc "test"} [1 2]')
     end
   end
 
@@ -188,18 +192,18 @@ describe EDN::Parser do
     end
   end
 
-  context "tagged value" do
+  context "tagged element" do
     context "#inst" do
       it "should consume #inst" do
-        rant(RantlyHelpers::INST).each do |value|
-          parser.tagged_value.should parse(value)
+        rant(RantlyHelpers::INST).each do |element|
+          parser.tagged_element.should parse(element)
         end
       end
     end
 
-    it "should consume tagged values" do
-      rant(RantlyHelpers::TAGGED_VALUE).each do |value|
-        parser.tagged_value.should parse(value)
+    it "should consume tagged elements" do
+      rant(RantlyHelpers::TAGGED_ELEMENT).each do |element|
+        parser.tagged_element.should parse(element)
       end
     end
   end

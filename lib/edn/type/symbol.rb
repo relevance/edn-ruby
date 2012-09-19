@@ -1,6 +1,8 @@
 module EDN
   module Type
     class Symbol
+      include EDN::CoreExt::AllowsMetadata
+
       attr_reader :symbol
 
       def initialize(sym)
