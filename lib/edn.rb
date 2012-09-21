@@ -4,6 +4,7 @@ require 'edn/core_ext'
 require 'edn/types'
 require 'edn/parser'
 require 'edn/transform'
+require 'edn/reader'
 
 module EDN
   class ParseFailed < StandardError

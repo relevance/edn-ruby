@@ -3,6 +3,27 @@ require 'parslet/ignore'
 
 module EDN
   class Parser < Parslet::Parser
+
+    def parse_prefix(str, options={})
+      source = Parslet::Source.new(str.to_s)
+      success, value = setup_and_apply(source, nil)
+
+      unless success
+        reporter = options[:reporter] || Parslet::ErrorReporter::Tree.new
+        success, value = setup_and_apply(source, reporter)
+
+        fail "Assertion failed: success was true when parsing with reporter" if success
+        value.raise
+      end
+
+      rest = nil
+      if !source.eof?
+        rest = source.consume(source.chars_left).to_s
+      end
+
+      return [flatten(value), rest]
+    end
+
     root(:top)
 
     rule(:top) {

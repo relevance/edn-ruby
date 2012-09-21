@@ -34,6 +34,27 @@ data.to_edn
 
 By default, this will work for strings, symbols, numbers, arrays, hashes, sets, nil, Time, and boolean values.
 
+### Multiple element reading
+
+If you have a string of **edn** that contains multiple forms, you can create an `EDN::Reader`, which extends `Enumerable`.
+
+```ruby
+r = EDN::Reader.new('[1 2 3] {:a 1 :b 2}')
+
+r.read #=> [1, 2, 3]
+r.read #=> {:a => 1, :b => 2}
+r.read #=> RuntimeError: EDN::Reader is out of string!
+
+r.each do |form|
+  p form
+end
+
+#=> [1, 2, 3]
+#=> {:a => 1, :b => 2}
+
+r.count #=> 2
+```
+
 ### Value Translations
 
 **edn** has some different terminology, and some types that do not map cleanly to Ruby.
