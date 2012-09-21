@@ -6,12 +6,27 @@ require 'edn/parser'
 require 'edn/transform'
 
 module EDN
+  class ParseFailed < StandardError
+    attr_reader :original_exception
+
+    def initialize(message, original_exception)
+      super(message)
+      @original_exception = original_exception
+    end
+  end
+
   @parser = EDN::Parser.new
   @transform = EDN::Transform.new
   @tags = Hash.new
 
   def self.read(edn)
-    @transform.apply(@parser.parse(edn))
+    begin
+      tree = @parser.parse(edn)
+    rescue Parslet::ParseFailed => error
+      message = "Invalid EDN, cannot parse: #{edn}"
+      raise ParseFailed.new(message, error)
+    end
+    @transform.apply(tree)
   end
 
   def self.register(tag, func = nil, &block)
