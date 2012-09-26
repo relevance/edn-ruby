@@ -1,6 +1,6 @@
 # edn-ruby
 
-[![Build Status](https://secure.travis-ci.org/relevance/edn-ruby.png)](http://travis-ci.org/relevance/edn-ruby)])
+[![Build Status](https://secure.travis-ci.org/relevance/edn-ruby.png)](http://travis-ci.org/relevance/edn-ruby)
 
 
 &copy; 2012 Relevance Inc
