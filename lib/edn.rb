@@ -57,8 +57,8 @@ module EDN
     end
   end
 
-  def self.tagout(tag, element)
-    ["##{tag}", element.to_edn].join(" ")
+  def self.tagout(tag, *elements)
+    ["##{tag}", *elements.map(&:to_edn)].join(" ")
   end
 
   def self.symbol(text)
