@@ -103,7 +103,7 @@ EDN.register("clinton/uri") do |uri|
   URI(uri)
 end
 
-EDN.register("clinton/date", lambda { |date_array| Date.new(*date_array) }
+EDN.register("clinton/date", lambda { |date_array| Date.new(*date_array) })
 
 class Dog
   def initialize(name)
