@@ -35,7 +35,9 @@ module EDN
       func = block
     end
 
-    raise "EDN.register requires a block or callable." if func.nil?
+    if func.nil?
+      func = lambda { |x| x }
+    end
 
     if func.is_a?(Class)
       @tags[tag] = lambda { |*args| func.new(*args) }
