@@ -140,8 +140,8 @@ This method calls `.to_edn` on the second argument and joins the arguments appro
 
 Other examples are:
 ```
-EDN.tagout("#wolf/pack", {:alpha=>"Greybeard", :betas=>["Frostpaw", "Blackwind", "Bloodjaw"]})
- => "##wolf/pack {:alpha \"Greybeard\", :betas [\"Frostpaw\" \"Blackwind\" \"Bloodjaw\"]}"
+EDN.tagout("wolf/pack", {:alpha=>"Greybeard", :betas=>["Frostpaw", "Blackwind", "Bloodjaw"]})
+ => "#wolf/pack {:alpha \"Greybeard\", :betas [\"Frostpaw\" \"Blackwind\" \"Bloodjaw\"]}"
 
 EDN.tagout("my/range", *0..9)
  => "#my/range 0 1 2 3 4 5 6 7 8 9"
