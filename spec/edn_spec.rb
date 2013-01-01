@@ -81,6 +81,13 @@ describe EDN do
     end
   end
 
+  context "#register" do
+    it "uses the identity function when no handler is given" do
+      EDN.register "some/tag"
+      EDN.read("#some/tag {}").class.should == Hash
+    end
+  end
+
   context "writing" do
     it "writes any valid element" do
       elements = rant(RantlyHelpers::ELEMENT)
