@@ -143,8 +143,14 @@ Other examples are:
 EDN.tagout("wolf/pack", {:alpha=>"Greybeard", :betas=>["Frostpaw", "Blackwind", "Bloodjaw"]})
  => "#wolf/pack {:alpha \"Greybeard\", :betas [\"Frostpaw\" \"Blackwind\" \"Bloodjaw\"]}"
 
-EDN.tagout("my/range", *0..9)
- => "#my/range 0 1 2 3 4 5 6 7 8 9"
+class Range
+  def to_edn
+    EDN.tagout("ruby/range", [self.begin, self.end, self.exclude_end?])
+  end
+end
+
+(0..9).to_edn
+=> "#ruby/range [0 9 false]"
 ```
 
 
