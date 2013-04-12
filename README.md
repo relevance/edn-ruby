@@ -64,7 +64,7 @@ r.count #=> 2
 
 **NOTE**: Comments requested on the following.
 
-In **edn**, you have _keywords_, which look like Ruby symbols and have the same meaning and purpose. These are converted to Ruby symbols. 
+In **edn**, you have _keywords_, which look like Ruby symbols and have the same meaning and purpose. These are converted to Ruby symbols.
 
 You have **edn** _symbols_, which generally reflect variable names, but have several purposes. We parse these and return `EDN::Type::Symbol` values for them, as they are not directly portable into Ruby. To create an **edn** symbol in Ruby, call `EDN::Type::Symbol.new` or `EDN.symbol` with a string argument, or use the convenience unary operator `~` like so: `~"elf/rings"`.
 
@@ -172,6 +172,7 @@ More than one piece of metadata can be applied to an element. Metadata is applie
 ## Contributors
 
 * Clinton N. Dreisbach (@crnixon)
+* Michael Ficarra (@michaelficarra)
 * Gabriel Horner (@cldwalker)
 
 ## Contributing
