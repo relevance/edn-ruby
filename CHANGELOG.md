@@ -1,3 +1,6 @@
+# 1.0.1
+* EDN.register defaults to the identity function when no handler is given
+
 # 0.9.4 (18 Sep 2012)
 
 * Require `set`
