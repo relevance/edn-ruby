@@ -98,7 +98,7 @@ module EDN
     rule(:integer) {
       (match['\-\+'].maybe >>
        (str('0') | match('[1-9]') >> digit.repeat)).as(:integer) >>
-      str('N').maybe.as(:precision)
+      (str('N') | str("M") ).maybe.as(:precision)
     }
 
     rule(:float) {
