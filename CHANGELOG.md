@@ -1,3 +1,6 @@
+# 1.0.2
+* Handle numbers with M precision
+
 # 1.0.1
 * EDN.register defaults to the identity function when no handler is given
 
