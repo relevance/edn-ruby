@@ -173,6 +173,7 @@ More than one piece of metadata can be applied to an element. Metadata is applie
 
 * Clinton N. Dreisbach (@crnixon)
 * Michael Ficarra (@michaelficarra)
+* Andrew Forward (@aforward)
 * Gabriel Horner (@cldwalker)
 
 ## Contributing
