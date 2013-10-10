@@ -58,6 +58,21 @@ end
 r.count #=> 2
 ```
 
+### Stream reading
+
+If you want to parse **edn** in chunks (for example, when reading the data from stream), you can use `EDN::StreamReader`.
+
+```ruby
+r = EDN::StreamReader.new(lambda {|form| p form})
+
+r << "[1 2" # handler isn't called because the form is not complete
+r << "] {:a 1 :b 2}"
+
+#=> [1, 2, 3]
+#=> {:a => 1, :b => 2}
+
+```
+
 ### Value Translations
 
 **edn** has some different terminology, and some types that do not map cleanly to Ruby.
