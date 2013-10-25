@@ -21,8 +21,8 @@ module EDN
     end
 
     def self.parse_string(string)
+      return '' if string.size == 0
       string = string.to_s
-      return '' if string.empty?
       string = string.gsub(%r((?:\\[\\bfnrt"/]|(?:\\u(?:[A-Fa-f\d]{4}))+|\\[\x20-\xff]))n) do |c|
         #" Clear messed up syntax highlighting with Emacs.
         if u = UNESCAPE_MAP[$&[1]]
