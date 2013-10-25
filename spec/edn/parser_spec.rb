@@ -124,6 +124,10 @@ describe EDN::Parser do
   end
 
   context "string" do
+    it "should consume an empty string" do
+      parser.string.should parse('""')
+    end
+
     it "should consume any string" do
       rant(RantlyHelpers::STRING).each do |string|
         parser.string.should parse(string)

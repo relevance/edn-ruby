@@ -8,7 +8,6 @@ describe EDN do
       EDN.read("1").should == 1
       EDN.read("3.14").should == 3.14
       EDN.read("3.14M").should == BigDecimal("3.14")
-      EDN.read('"hello\nworld"').should == "hello\nworld"
       EDN.read(':hello').should == :hello
       EDN.read(':hello/world').should == :"hello/world"
       EDN.read('hello').should == EDN::Type::Symbol.new('hello')
@@ -26,6 +25,11 @@ describe EDN do
 
     it "reads #inst tagged elements" do
       EDN.read('#inst "2012-09-10T16:16:03-04:00"').should == DateTime.new(2012, 9, 10, 16, 16, 3, '-04:00')
+    end
+
+    it "reads strings" do
+      EDN.read('""').should == ""
+      EDN.read('"hello\nworld"').should == "hello\nworld"
     end
 
     it "reads vectors" do
