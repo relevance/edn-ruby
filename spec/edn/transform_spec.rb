@@ -25,6 +25,10 @@ describe EDN::Transform do
     it "should not evaluate interpolated Ruby code" do
       subject.apply(:string => 'hello\n#{world}').should == "hello\n\#{world}"
     end
+
+    it "should emit empty strings as strings" do
+      subject.apply(:string => []).should == ""
+    end
   end
 
   context "keyword" do
