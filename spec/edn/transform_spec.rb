@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'spec_helper'
 
 describe EDN::Transform do
@@ -24,6 +25,12 @@ describe EDN::Transform do
 
     it "should not evaluate interpolated Ruby code" do
       subject.apply(:string => 'hello\n#{world}').should == "hello\n\#{world}"
+    end
+  end
+  
+  context "string-utf8" do
+    it "should emit a string that preserves utf-8 characters" do
+      subject.apply(:string => 'öhai world').should == "öhai world"
     end
   end
 
