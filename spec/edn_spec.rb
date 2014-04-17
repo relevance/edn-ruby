@@ -4,6 +4,10 @@ describe EDN do
   include RantlyHelpers
 
   context "#read" do
+    it "reads an empty string" do
+      EDN.read('""').should == ""
+    end
+
     it "reads single elements" do
       EDN.read("1").should == 1
       EDN.read("3.14").should == 3.14
