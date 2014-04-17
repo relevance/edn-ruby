@@ -5,6 +5,7 @@ describe EDN do
 
   context "#read" do
     it "reads single elements" do
+      EDN.read(%q{""}).should == ""
       EDN.read("1").should == 1
       EDN.read("3.14").should == 3.14
       EDN.read("3.14M").should == BigDecimal("3.14")
