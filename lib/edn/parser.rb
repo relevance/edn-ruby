@@ -110,9 +110,15 @@ module EDN
     }
 
     rule(:string) {
-      str('"') >>
-      (str('\\') >> any | str('"').absent? >> any).repeat.as(:string) >>
-      str('"')
+      empty_string | full_string
+    }
+
+    rule(:empty_string) {
+      str('""').as(:empty_string)
+    }
+
+    rule(:full_string) {
+      str('"') >> (str('\\') >> any | str('"').absent? >> any).repeat.as(:string) >> str('"')
     }
 
     rule(:character) {
