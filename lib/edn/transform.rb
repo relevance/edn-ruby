@@ -20,6 +20,7 @@ module EDN
       end
     }
 
+    rule(:empty_string => simple(:x)) { '' }
     rule(:string => simple(:x)) { EDN::StringTransformer.parse_string(x) }
     rule(:keyword => simple(:x)) { x.to_sym }
     rule(:symbol => simple(:x)) { EDN::Type::Symbol.new(x) }
