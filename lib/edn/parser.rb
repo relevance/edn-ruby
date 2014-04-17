@@ -54,7 +54,7 @@ module EDN
       set |
       map |
       boolean |
-      str('nil').as(:nil) |
+      _nil |
       keyword |
       string |
       character |
@@ -131,7 +131,11 @@ module EDN
     }
 
     rule(:boolean) {
-      str('true').as(:true) | str('false').as(:false)
+      (str('true').as(:true) | str('false').as(:false)) >> valid_chars.absent?
+    }
+
+    rule(:_nil) {
+      str('nil').as(:nil) >> valid_chars.absent?
     }
 
     # Parts
