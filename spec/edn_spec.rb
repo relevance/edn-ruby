@@ -72,6 +72,20 @@ describe EDN do
         end
       end
     end
+
+    context "allows symbols starting with a reserved word" do
+      it "reads true-foo" do
+        EDN.read('true-foo').should == EDN::Type::Symbol.new('true-foo')
+      end
+
+      it "reads falsey" do
+        EDN.read('falsey').should == EDN::Type::Symbol.new('falsey')
+      end
+
+      it "reads nillable" do
+       EDN.read('nillable').should == EDN::Type::Symbol.new('nillable')
+      end
+    end
   end
 
   context "#register" do
