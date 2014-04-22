@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["clinton@thinkrelevance.com"]
   gem.description   = %q{'edn implements a reader for Extensible Data Notation by Rich Hickey.'}
   gem.summary       = gem.description
-  gem.homepage      = ""
+  gem.homepage      = "https://github.com/relevance/edn-ruby"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
