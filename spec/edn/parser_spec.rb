@@ -25,29 +25,28 @@ describe EDN::Parser do
 
   context "element" do
     it "should consume nil" do
-      parser.element.should parse("nil")
+      parser.should parse("nil")
     end
 
     it "should consume metadata with the element" do
-      parser.element.should parse('^{:doc "test"} [1 2]')
+      parser.should parse('^{:doc "test"} [1 2]')
     end
   end
 
   context "comment" do
     it "should consume and throw away comments" do
       comment = "; this is a comment"
-      parser.comment.should parse(comment)
-      parser.comment.parse(comment).should == "; this is a comment"
+      parser.should parse(comment)
     end
   end
 
   context "boolean" do
     it "should consume true" do
-      parser.boolean.should parse("true")
+      parser.should parse("true")
     end
 
     it "should consume false" do
-      parser.boolean.should parse("false")
+      parser.should parse("false")
     end
   end
 
