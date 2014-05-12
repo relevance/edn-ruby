@@ -134,7 +134,6 @@ module EDN
 
     def read_extension
       @s.advance
-      #puts "read extension, current: #{@s.current}"
       if @s.current == '{'
         @s.advance
         read_collection(Set, '}')
@@ -144,7 +143,6 @@ module EDN
         NOTHING
       else
         tag = read_symbol_chars
-        #puts "tag: #{tag}"
         value = read
         EDN.tagged_element(tag, value)
       end
@@ -206,7 +204,6 @@ module EDN
     def read_basic
       @s.skip_ws
       ch = @s.current
-      #puts "read_basic: #{ch} #{READERS[ch]}"
       result = self.send(READERS[ch])
       while result == NOTHING
         @s.skip_ws
@@ -237,7 +234,7 @@ module EDN
     def finish_float(whole_part)
       result = whole_part
       result += @s.skip_past('.', 'Expected .')
-      result += read_digits(1) # TBD should be at least 1 digit
+      result += read_digits(1)
       if @s.current == 'e' || @s.current == 'E'
         @s.advance
         result = result + 'e' + read_digits
