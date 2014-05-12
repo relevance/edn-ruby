@@ -25,12 +25,6 @@ describe EDN do
       EDN.read("123412341231212121241234M").should == 123412341231212121241234
     end
 
-=begin
-    it "reads #inst tagged elements",focus: true  do
-      EDN.read('#inst "2012-09-10T16:16:03-04:00"').should == DateTime.new(2012, 9, 10, 16, 16, 3, '-04:00')
-    end
-=end
-
     it "reads vectors" do
       EDN.read('[]').should == []
       EDN.read('[1]').should == [1]
