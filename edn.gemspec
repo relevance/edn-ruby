@@ -2,7 +2,7 @@
 require File.expand_path('../lib/edn/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.authors       = ["Clinton N. Dreisbach"]
+  gem.authors       = ["Clinton N. Dreisbach & Russ Olsen"]
   gem.email         = ["clinton@thinkrelevance.com"]
   gem.description   = %q{'edn implements a reader for Extensible Data Notation by Rich Hickey.'}
   gem.summary       = gem.description
@@ -15,7 +15,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = EDN::VERSION
 
-  gem.add_dependency 'parslet', '~> 1.4.0'
   gem.add_development_dependency 'pry', '~> 0.9.10'
   gem.add_development_dependency 'rspec', '~> 2.11.0'
   gem.add_development_dependency 'rantly', '~> 0.3.1'
