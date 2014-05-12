@@ -75,8 +75,7 @@ module EDN
     end
 
     def read_char
-      @s.advance
-      result = @s.current
+      result = @s.advance
       @s.advance
       until @s.eof?
         break unless @s.digit? || @s.alpha?
@@ -121,7 +120,7 @@ module EDN
         result << ch
         ch = @s.advance
       end
-      return result unless skip_past('/')
+      return result unless @s.skip_past('/')
 
       result << '/'
       ch = @s.current
@@ -216,7 +215,7 @@ module EDN
       result
     end
   
-    def read_digits
+    def read_digits(min_digits=0)
       result = ''
 
       if @s.current == '+' || @s.current == '-'
@@ -224,33 +223,26 @@ module EDN
         @s.advance
       end
  
+      n_digits = 0
       while @s.current =~ /[0-9]/
+        n_digits += 1
         result << @s.current
         @s.advance
       end
 
+      raise "Expected at least #{min_digits} digits, found #{result}" unless n_digits >= min_digits
       result
-    end
-
-    def skip_past(expected, error_message=nil)
-      if @s.current == expected
-        @s.advance
-        return expected
-      elsif error_message
-        raise error_message
-      end
-      nil
     end
 
     def finish_float(whole_part)
       result = whole_part
-      result += skip_past('.', 'Expected .')
-      result += read_digits # TBD should be at least 1 digit
+      result += @s.skip_past('.', 'Expected .')
+      result += read_digits(1) # TBD should be at least 1 digit
       if @s.current == 'e' || @s.current == 'E'
         @s.advance
         result = result + 'e' + read_digits
       end
-      result.to_f # TBD deal with 1.0E25
+      result.to_f 
     end
 
     def read_number(leading='')
@@ -258,7 +250,7 @@ module EDN
 
       if @s.current == '.'
         return finish_float(result)
-      elsif skip_past('M') || skip_past('N')
+      elsif @s.skip_past('M') || @s.skip_past('N')
         result.to_i
       else
         result.to_i
@@ -297,7 +289,6 @@ module EDN
     def read_map
       @s.advance
       array = read_collection(Array, '}')
-      binding.pry unless array.count.even?
       raise "Need an even number of items for a map" unless array.count.even?
       Hash[*array]
     end

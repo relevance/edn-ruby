@@ -9,15 +9,9 @@ module EDN
       @current = nil
     end
 
-    def xcurrent
+    def current
       return @current if @current
       advance
-    end
-
-    def current
-      ch = xcurrent
-      #puts "Current: #{ch}"
-      ch
     end
 
     def advance
@@ -58,6 +52,16 @@ module EDN
       repeat(pattern) do |result, ch|
         result << ch
       end
+    end
+
+    def skip_past(expected, error_message=nil)
+      if current == expected
+        advance
+        return expected
+      elsif error_message
+        raise error_message
+      end
+      nil
     end
 
     def skip_to_eol
