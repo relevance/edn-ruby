@@ -3,6 +3,7 @@ require 'edn/version'
 require 'edn/core_ext'
 require 'edn/types'
 require 'edn/metadata'
+require 'edn/char_stream'
 require 'edn/parser'
 require 'edn/reader'
 
