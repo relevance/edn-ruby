@@ -145,14 +145,9 @@ describe EDN::Parser do
   end
 
   context "map" do
-    it "should consume an empty map" do
-      EDN.read('{}')
-      EDN.read('{ }')
-    end
-
     it "should consume maps of mixed elements" do
       rant(RantlyHelpers::MAP).each do |map|
-        EDN.read(map)
+        expect { EDN.read(map) }.not_to raise_error
       end
     end
   end
@@ -161,14 +156,14 @@ describe EDN::Parser do
     context "#inst" do
       it "should consume #inst" do
         rant(RantlyHelpers::INST).each do |element|
-          EDN.read(element)
+          expect { EDN.read(element) }.not_to raise_error
         end
       end
     end
 
     it "should consume tagged elements" do
       rant(RantlyHelpers::TAGGED_ELEMENT).each do |element|
-        EDN.read(element)
+        expect { EDN.read(element) }.not_to raise_error
       end
     end
   end

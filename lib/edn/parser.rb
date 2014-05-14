@@ -1,4 +1,3 @@
-require 'pry'
 require 'stringio'
 require 'set'
 
@@ -95,7 +94,6 @@ module EDN
       when 'space'
         " "
       else
-        binding.pry
         raise "Unknown char #{result}"
       end
     end
