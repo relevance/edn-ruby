@@ -110,10 +110,8 @@ describe EDN do
       elements = rant(RantlyHelpers::ELEMENT)
       elements.each do |element|
         ruby_element = EDN.read(element)
-        binding.pry unless ruby_element == EDN.read(ruby_element.to_edn)
         ruby_element.should == EDN.read(ruby_element.to_edn)
         if ruby_element.respond_to?(:metadata)
-          binding.pry unless ruby_element.metadata == EDN.read(ruby_element.to_edn).metadata
           ruby_element.metadata.should == EDN.read(ruby_element.to_edn).metadata
         end
       end
