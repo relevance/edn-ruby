@@ -49,6 +49,8 @@ module RantlyHelpers
 
   STRING = lambda { |_| sized(range(1, 100)) { string.to_edn } }
 
+  RUBY_STRING = lambda { |_| sized(range(1, 100)) { string } }
+
   FLOAT = lambda { |_| (float * range(-4000, 5000)).to_edn }
 
   FLOAT_WITH_EXP = lambda { |_|
@@ -59,6 +61,14 @@ module RantlyHelpers
     [f, choose("e", "E", "e+", "E+", "e-", "e+"), range(1, 100)].
     map(&:to_s).
     join("")
+  }
+
+  RUBY_CHAR = lambda { |_|
+    "\\" +
+    sized(1) {
+      freq([1, [:choose, "\n", "\r", " ", "\t"]],
+           [5, [:string, :graph]])
+    }
   }
 
   CHARACTER = lambda { |_|
