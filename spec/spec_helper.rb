@@ -1,12 +1,10 @@
 require 'rspec'
 require 'edn'
-require 'parslet/rig/rspec'
-require 'parslet/convenience'
 require 'rantly'
 require 'date'
 require 'time'
 
-REPEAT = (ENV["REPEAT"] || 100).to_i
+REPEAT = (ENV["REPEAT"] || 150).to_i
 
 RSpec.configure do |c|
   c.fail_fast = true
@@ -17,6 +15,10 @@ RSpec.configure do |c|
 
   c.filter_run :focus
   c.run_all_when_everything_filtered = true
+end
+
+def io_for(s)
+  StringIO.new(s)
 end
 
 module RantlyHelpers
@@ -47,7 +49,9 @@ module RantlyHelpers
 
   STRING = lambda { |_| sized(range(1, 100)) { string.to_edn } }
 
-  FLOAT = lambda { |_| (float * range(-1000, 1000)).to_edn }
+  RUBY_STRING = lambda { |_| sized(range(1, 100)) { string } }
+
+  FLOAT = lambda { |_| (float * range(-4000, 5000)).to_edn }
 
   FLOAT_WITH_EXP = lambda { |_|
     # limited range because of Infinity
@@ -57,6 +61,14 @@ module RantlyHelpers
     [f, choose("e", "E", "e+", "E+", "e-", "e+"), range(1, 100)].
     map(&:to_s).
     join("")
+  }
+
+  RUBY_CHAR = lambda { |_|
+    "\\" +
+    sized(1) {
+      freq([1, [:choose, "\n", "\r", " ", "\t"]],
+           [5, [:string, :graph]])
+    }
   }
 
   CHARACTER = lambda { |_|
