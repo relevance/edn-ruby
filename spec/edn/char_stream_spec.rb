@@ -108,6 +108,4 @@ describe EDN::CharStream do
     s.skip_ws
     s.current.should == "a"
   end
-
-
 end
