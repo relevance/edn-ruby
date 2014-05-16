@@ -54,15 +54,32 @@ module EDN
     READERS['/'] = :read_slash
     READERS[':'] = :read_keyword
     READERS['#'] = :read_extension
+    READERS[:eof] = :read_eof
     DIGITS.each {|n| READERS[n.to_s] = :read_number}
 
     READERS.default = :unknown
 
     NOTHING = Object.new
 
-    def initialize(source=$stdin)
+    def initialize(source, *extra)
       io = source.instance_of?(String) ? StringIO.new(source) : source
       @s = CharStream.new(io)
+
+      @eof_value = extra.empty? ? NOTHING : extra.first
+    end
+  
+    def read
+      meta = read_meta
+      value = read_basic
+      if meta
+        value.extend EDN::Metadata
+        value.metadata = meta
+      end
+      value
+    end
+
+    def parse
+      read
     end
   
     def eof?
@@ -71,6 +88,13 @@ module EDN
 
     def unknown
       raise "Don't know what to do with #{@s.current} #{@s.current.class}"
+    end
+
+    def read_eof
+      if @eof_value == NOTHING
+        raise "Unexpected end of file"
+      end
+      @eof_value
     end
 
     def read_char
@@ -183,20 +207,6 @@ module EDN
       end
       @s.advance
       result
-    end
-  
-    def read
-      meta = read_meta
-      value = read_basic
-      if meta
-        value.extend EDN::Metadata
-        value.metadata = meta
-      end
-      value
-    end
-
-    def parse
-      read
     end
 
     def read_basic

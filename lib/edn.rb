@@ -8,25 +8,10 @@ require 'edn/parser'
 require 'edn/reader'
 
 module EDN
-  class ParseFailed < StandardError
-    attr_reader :original_exception
-
-    def initialize(message, original_exception)
-      super(message)
-      @original_exception = original_exception
-    end
-  end
-
   @tags = Hash.new
 
-  def self.read(edn)
-    #begin
-      return EDN::Parser.new(StringIO.new(edn)).read
-    #rescue Exception => error
-      # message = "Invalid EDN, cannot parse: #{edn}"
-      # raise ParseFailed.new(message, error)
-    #  return "Invalid EDN, cannot parse: #{edn}"
-    #end
+  def self.read(edn, *extra)
+    EDN::Parser.new(edn, *extra).read
   end
 
   def self.register(tag, func = nil, &block)
