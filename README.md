@@ -29,6 +29,16 @@ To read a string of **edn**:
 EDN.read('[1 2 {:foo "bar"}]')
 ```
 
+Alternatively you can pass in an IO instance, for
+example an open file:
+
+```ruby
+File.open("data.edn") do |f|
+  data = EDN.read(f)
+  # Do something with data
+end
+```
+
 To convert a data structure to an **edn** string:
 
 ```ruby
@@ -39,7 +49,7 @@ By default, this will work for strings, symbols, numbers, arrays, hashes, sets, 
 
 ### Multiple element reading
 
-If you have a string of **edn** that contains multiple forms, you can create an `EDN::Reader`, which extends `Enumerable`.
+If you have a string or IO instance that contains multiple forms, you can create an `EDN::Reader`, which extends `Enumerable`.
 
 ```ruby
 r = EDN::Reader.new('[1 2 3] {:a 1 :b 2}')
@@ -57,6 +67,28 @@ end
 
 r.count #=> 2
 ```
+
+### Handing end of file
+
+By default, the read methods will throw an exception if you try to
+read the end of file:
+
+```ruby
+EDN.read("")
+
+#=> RuntimeError: Unexpected end of file
+```
+
+Alternatively you can specify a value for `read` to return when
+it hits the end of the data:
+
+```ruby
+EDN.read("", :nomore)
+
+#=> :nomore
+```
+
+There is no problem using `nil` as an eof value.
 
 ### Value Translations
 
@@ -175,6 +207,7 @@ More than one piece of metadata can be applied to an element. Metadata is applie
 * Michael Ficarra (@michaelficarra)
 * Andrew Forward (@aforward)
 * Gabriel Horner (@cldwalker)
+* Russ Olsen (@russolsen)
 
 ## Contributing
 
