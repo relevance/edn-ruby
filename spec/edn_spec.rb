@@ -1,9 +1,32 @@
 require 'spec_helper'
+require 'stringio'
 
 describe EDN do
   include RantlyHelpers
 
   context "#read" do
+    it "reads from a stream" do
+      io = StringIO.new("123")
+      EDN.read(io).should == 123
+    end
+
+    it "raises an exception on eof by default" do
+      expect { EDN.read('') }.to raise_error
+    end
+
+    it "allows you to specify an eof value" do
+      io = StringIO.new("123 456")
+      EDN.read(io, :my_eof).should == 123
+      EDN.read(io, :my_eof).should == 456
+      EDN.read(io, :my_eof).should == :my_eof
+    end
+
+    it "allows you to specify nil as an eof value" do
+      EDN.read("", nil).should == nil
+    end
+  end
+
+  context "reading data" do
     it "reads single elements" do
       EDN.read(%q{""}).should == ""
       EDN.read("1").should == 1
