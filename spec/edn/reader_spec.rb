@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe EDN::Reader do
-  let(:reader) { EDN::Reader.new("[1 2] 3 :a {:b c}") }
+  let(:reader) { EDN::Reader.new("[1 2] 3 :a {:b c} ") }
 
   it "should respond to count" do
     reader.count.should == 4

@@ -3,6 +3,17 @@ require 'set'
 
 
 module EDN
+
+  # Object returned when there is nothing to return
+
+  NOTHING = Object.new
+
+  # Object to return when we hit end of file. Cant be nil or :eof
+  # because either of those could be something in the EDN data.
+
+  EOF = Object.new
+
+
   @handlers = {}
 
   def self.register(tag, func = nil, &block)
@@ -59,13 +70,9 @@ module EDN
 
     READERS.default = :unknown
 
-    NOTHING = Object.new
-
     def initialize(source, *extra)
       io = source.instance_of?(String) ? StringIO.new(source) : source
       @s = CharStream.new(io)
-
-      @eof_value = extra.empty? ? NOTHING : extra.first
     end
   
     def read
@@ -91,10 +98,7 @@ module EDN
     end
 
     def read_eof
-      if @eof_value == NOTHING
-        raise "Unexpected end of file"
-      end
-      @eof_value
+      EOF
     end
 
     def read_char

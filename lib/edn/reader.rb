@@ -1,13 +1,16 @@
 module EDN
-  class Reader < Parser
+  class Reader
     include Enumerable
 
+    def initialize(source)
+      @parser = Parser.new(source)
+    end
+
     def each
-      #reset!
       return enum_for(:select) unless block_given?
 
-      until eof?
-        yield read
+      until (result = @parser.read) == EOF
+        yield result
       end
     end
   end
