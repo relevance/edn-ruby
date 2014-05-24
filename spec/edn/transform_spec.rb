@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'spec_helper'
 
 describe EDN::Transform do
@@ -28,6 +29,12 @@ describe EDN::Transform do
 
     it "should emit empty strings as strings" do
       subject.apply(:string => []).should == ""
+    end
+  end
+  
+  context "string-utf8" do
+    it "should emit a string that preserves utf-8 characters" do
+      subject.apply(:string => 'öhai world').should == "öhai world"
     end
   end
 
