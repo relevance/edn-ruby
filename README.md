@@ -39,6 +39,28 @@ File.open("data.edn") do |f|
 end
 ```
 
+You can also do things in a more object oriented way by
+created instances of EDN::Reader:
+
+```ruby
+r = EDN::Reader.new('1 2 3')
+r.read  # returns 1
+r.read  # returns 2
+r.read  # returns 3
+r.read  # Throws an exception!
+```end
+
+Both flavors of `read` takes an optional argument,
+which is the value to return when there is no more data:
+
+```ruby
+r = EDN::Reader.new('1 2 3')
+r.read(:eof)  # returns 1
+r.read(:eof)  # returns 2
+r.read(:eof)  # returns 3
+r.read(:eof)  # returns :eof
+```end
+
 To convert a data structure to an **edn** string:
 
 ```ruby
@@ -47,8 +69,9 @@ data.to_edn
 
 By default, this will work for strings, symbols, numbers, arrays, hashes, sets, nil, Time, and boolean values.
 
-### Multiple element reading
+### EDN::Reader
 
+If you are 
 If you have a string or IO instance that contains multiple forms, you can create an `EDN::Reader`, which extends `Enumerable`.
 
 ```ruby

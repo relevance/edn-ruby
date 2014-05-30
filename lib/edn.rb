@@ -11,14 +11,7 @@ module EDN
   @tags = Hash.new
 
   def self.read(edn, eof_value=NOTHING)
-    result = EDN::Parser.new(edn).read
-    if result == EOF && eof_value == NOTHING
-      raise "Unexpected end of file"
-    elsif result == EOF && eof_value != NOTHING
-      eof_value
-    else
-      result
-    end
+    EDN::Reader.new(edn).read(eof_value)
   end
 
   def self.register(tag, func = nil, &block)

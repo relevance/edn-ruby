@@ -1,14 +1,20 @@
 module EDN
   class Reader
-    include Enumerable
 
     def initialize(source)
       @parser = Parser.new(source)
     end
 
-    def each
-      return enum_for(:select) unless block_given?
+    def read(eof_value = NOTHING)
+      result = @parser.read
+      if result == EOF 
+        raise "Unexpected end of file" if eof_value == NOTHING
+        return eof_value
+      end
+      result
+    end
 
+    def each
       until (result = @parser.read) == EOF
         yield result
       end

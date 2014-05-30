@@ -74,7 +74,7 @@ module EDN
       io = source.instance_of?(String) ? StringIO.new(source) : source
       @s = CharStream.new(io)
     end
-  
+
     def read
       meta = read_meta
       value = read_basic
@@ -85,10 +85,6 @@ module EDN
       value
     end
 
-    def parse
-      read
-    end
-  
     def eof?
       @s.eof?
     end

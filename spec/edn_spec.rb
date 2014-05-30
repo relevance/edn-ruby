@@ -10,6 +10,13 @@ describe EDN do
       EDN.read(io).should == 123
     end
 
+    it "reads mutiple values from a stream" do
+      io = StringIO.new("123 456 789")
+      EDN.read(io).should == 123
+      EDN.read(io).should == 456
+      EDN.read(io).should == 789
+    end
+
     it "raises an exception on eof by default" do
       expect { EDN.read('') }.to raise_error
     end
