@@ -134,7 +134,7 @@ describe EDN do
       elements.each do |element|
         ruby_element = EDN.read(element)
 
-        if ruby_element.respond_to?(:round)
+        if ruby_element.kind_of?(Numeric)
           ruby_element.should be_within(0.1).of(EDN.read(ruby_element.to_edn))
         else
           ruby_element.should == EDN.read(ruby_element.to_edn)
