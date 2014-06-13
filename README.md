@@ -23,7 +23,7 @@ Or install it yourself as:
 
 ## Usage
 
-To read a string of **edn**:
+To read a string of EDN:
 
 ```ruby
 EDN.read('[1 2 {:foo "bar"}]')
@@ -40,7 +40,7 @@ end
 ```
 
 You can also do things in a more object oriented way by
-created instances of EDN::Reader:
+created instances of `EDN::Reader`:
 
 ```ruby
 r = EDN::Reader.new('1 2 3')
@@ -61,7 +61,7 @@ r.read(:eof)  # returns 3
 r.read(:eof)  # returns :eof
 ```end
 
-To convert a data structure to an **edn** string:
+To convert a data structure to an EDN string:
 
 ```ruby
 data.to_edn
@@ -71,8 +71,7 @@ By default, this will work for strings, symbols, numbers, arrays, hashes, sets, 
 
 ### EDN::Reader
 
-If you are 
-If you have a string or IO instance that contains multiple forms, you can create an `EDN::Reader`, which extends `Enumerable`.
+If you have a string or IO instance that contains multiple forms, you can create an `EDN::Reader`:
 
 ```ruby
 r = EDN::Reader.new('[1 2 3] {:a 1 :b 2}')
@@ -80,6 +79,12 @@ r = EDN::Reader.new('[1 2 3] {:a 1 :b 2}')
 r.read #=> [1, 2, 3]
 r.read #=> {:a => 1, :b => 2}
 r.read #=> RuntimeError: EDN::Reader is out of string!
+```
+
+You can also iterate through the forms with `each`:
+
+```ruby
+r = EDN::Reader.new('[1 2 3] {:a 1 :b 2}')
 
 r.each do |form|
   p form
@@ -87,9 +92,9 @@ end
 
 #=> [1, 2, 3]
 #=> {:a => 1, :b => 2}
-
-r.count #=> 2
 ```
+
+Note that EDN::Reader is no longer `Enumerable`.
 
 ### Handing end of file
 
@@ -115,29 +120,41 @@ There is no problem using `nil` as an eof value.
 
 ### Value Translations
 
-**edn** has some different terminology, and some types that do not map cleanly to Ruby.
+Note that EDN uses its own terminology for the types of objects it represents
+and in some cases those types not map cleanly to Ruby.
 
-**NOTE**: Comments requested on the following.
+In EDN, you have _keywords_, which look like Ruby symbols and have the same meaning and
+purpose. These are converted to Ruby symbols.
 
-In **edn**, you have _keywords_, which look like Ruby symbols and have the same meaning and purpose. These are converted to Ruby symbols.
+You also have EDN _symbols_, which generally reflect variable names, but have
+several purposes. We parse these and return `EDN::Type::Symbol` values for them,
+as they don't map to anything built into Ruby. To create an EDN symbol in Ruby,
+call `EDN::Type::Symbol.new` or `EDN.symbol` with a string argument, or use the
+convenience unary operator `~` like so: `~"elf/rings"`.
 
-You have **edn** _symbols_, which generally reflect variable names, but have several purposes. We parse these and return `EDN::Type::Symbol` values for them, as they are not directly portable into Ruby. To create an **edn** symbol in Ruby, call `EDN::Type::Symbol.new` or `EDN.symbol` with a string argument, or use the convenience unary operator `~` like so: `~"elf/rings"`.
+EDN also has _vectors_, which map to Ruby arrays, and _lists_, which are linked lists
+in Clojure. We map EDN lists to `EDN::Type::List` values, which are type-compatible with
+arrays. To create an EDN list in Ruby, call `EDN::Type::List.new` or `EDN.list`
+with all arguments to go in the list. If you have an array, you will use the splat
+operator, like so: `EDN.list(*[1, 2, 3])`. You can also use the `~` unary
+operator like so: `~[1, 2, 3]`.
 
-You have _vectors_, which map to Ruby arrays, and _lists_, which are linked lists in Clojure. We map these to `EDN::Type::List` values, which are type-compatible with arrays. To create an **edn** list in Ruby, call `EDN::Type::List.new` or `EDN.list` with all arguments to go in the list. If you have an array, you will use the splat operator, like so: `EDN.list(*[1, 2, 3])`. You can also use the `~` unary operator like so: `~[1, 2, 3]`.
-
-**edn** has character types, but Ruby does not. These are converted into one-character strings.
+EDN also has character types, but Ruby does not. These are converted into one-character strings.
 
 ### Tagged Values
 
-The interesting part of **edn** is the _extensible_ part. Data can be be _tagged_ to coerce interpretation of it to a particular data type. An example of a tagged data element:
+The interesting part of EDN is the _extensible_ part.
+Data can be be _tagged_ to coerce interpretation of
+it to a particular data type. An example of a tagged data element:
 
 ```
 #wolf/pack {:alpha "Greybeard" :betas ["Frostpaw" "Blackwind" "Bloodjaw"]}
 ```
 
-The tag (`#wolf/pack`) will tell any consumers of this data to use a data type registered to handle `wolf/pack` to represent this data.
+The tag (`#wolf/pack`) will tell any consumers of this data
+to use a data type registered to handle `wolf/pack` to represent this data.
 
-The rules for tags from the [**edn** README][README] should be followed. In short, custom tags should have a prefix (the part before the `/`) designating the user that created them or context they are used in. Non-prefixed tags are reserved for built-in tags.
+The rules for tags from the [EDN README][README] should be followed. In short, custom tags should have a prefix (the part before the `/`) designating the user that created them or context they are used in. Non-prefixed tags are reserved for built-in tags.
 
 There are two tags built in by default: `#uuid`, used for UUIDs, and `#inst`, used for an instant in time. In `edn-ruby`, `#inst` is converted to a Time, and Time values are tagged as `#inst`. There is not a UUID data type built into Ruby, so `#uuid` is converted to an instance of `EDN::Type::UUID`.
 
@@ -211,7 +228,7 @@ end
 
 ## Metadata
 
-Certain elements of **edn** can have *metadata*. Metadata is a map of values about the element, which must follow specific rules.
+Certain elements of EDN can have *metadata*. Metadata is a map of values about the element, which must follow specific rules.
 
 * Only symbols, lists, vectors, maps, and sets can have metadata. Tagged elements *cannot* have metadata.
 * Metadata keys must be symbols, keywords, or strings.
@@ -220,7 +237,7 @@ Metadata can be expressed in one of the following three ways:
 
 * Via a map. The element is prefixed with a map which has a caret (`^`) prefixed to it, like so: `^{:doc "This is my vector" :rel :temps} [98.6 99.7]`.
 * Via a keyword. The element is prefixed with a keyword, also prefixed by a caret: `^:awesome #{1 2 \c}`. This results in the key `:awesome` being set to `true`, as if the metadata was: `^{:awesome true} #{1 2 \c}`.
-* Via a symbol. The element is prefixed with a symbol, also prefixed by a caret: `^Boolean "true"`. This results in the key `:tag` being set to the symbol, as if the metadata was: `^{:tag Boolean} "true"`. This is used in Clojure to indicate the Java type of the element. In other **edn** implementations, it may be ignored or used differently.
+* Via a symbol. The element is prefixed with a symbol, also prefixed by a caret: `^Boolean "true"`. This results in the key `:tag` being set to the symbol, as if the metadata was: `^{:tag Boolean} "true"`. This is used in Clojure to indicate the Java type of the element. In other EDN implementations, it may be ignored or used differently.
 
 More than one piece of metadata can be applied to an element. Metadata is applied to the next element appearing after it, so in the case of `^:foo ^{:bar false} [1 2]`, the metadata would be, in total, `^{:foo true, :bar false}`. Note that `^:foo` is applied to the element `[1 2]` with the metadata `^{:bar false}` applied to it. Because of this, key collisions are resolved *right-to-left*.
 
