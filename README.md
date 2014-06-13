@@ -5,7 +5,7 @@
 
 &copy; 2012 Relevance Inc
 
-**edn-ruby** is a Ruby library to read and write [edn][edn] (extensible data notation), a subset of Clojure used for transferring data between applications, much like JSON, YAML, or XML.
+**edn-ruby** is a Ruby library to read and write EDN (extensible data notation), a subset of Clojure used for transferring data between applications, much like JSON, YAML, or XML.
 
 ## Installation
 
@@ -39,46 +39,46 @@ File.open("data.edn") do |f|
 end
 ```
 
-You can also do things in a more object oriented way by
-created instances of `EDN::Reader`:
+By default EDN.read will throw an execption
+if you try to read past the end of the data:
 
 ```ruby
-r = EDN::Reader.new('1 2 3')
-r.read  # returns 1
-r.read  # returns 2
-r.read  # returns 3
-r.read  # Throws an exception!
-```end
-
-Both flavors of `read` takes an optional argument,
-which is the value to return when there is no more data:
-
-```ruby
-r = EDN::Reader.new('1 2 3')
-r.read(:eof)  # returns 1
-r.read(:eof)  # returns 2
-r.read(:eof)  # returns 3
-r.read(:eof)  # returns :eof
-```end
-
-To convert a data structure to an EDN string:
-
-```ruby
-data.to_edn
+EDN.read("")   # Boom!
 ```
 
-By default, this will work for strings, symbols, numbers, arrays, hashes, sets, nil, Time, and boolean values.
+Alternatively, the `EDN.read` method takes an optional
+parameter, which is the value to return
+when it hits the end of data:
+
+```ruby
+EDN.read("", :nomore)
+
+#=> :nomore
+```
+
+There is no problem using `nil` as an eof value.
 
 ### EDN::Reader
 
-If you have a string or IO instance that contains multiple forms, you can create an `EDN::Reader`:
+You can also do things in a more object oriented way by
+creating instances of `EDN::Reader`:
 
 ```ruby
 r = EDN::Reader.new('[1 2 3] {:a 1 :b 2}')
 
 r.read #=> [1, 2, 3]
 r.read #=> {:a => 1, :b => 2}
-r.read #=> RuntimeError: EDN::Reader is out of string!
+r.read #=> RuntimeError: Unexpected end of file
+```
+
+`EDN:Reader` will also take an IO instance:
+
+```ruby
+r = EDN::Reader.new(open("data.edn"))
+
+r.read  # Read the first form from the file.
+r.read  # Read the second form from the file.
+r.read  # Read the third from from the file.
 ```
 
 You can also iterate through the forms with `each`:
@@ -94,29 +94,29 @@ end
 #=> {:a => 1, :b => 2}
 ```
 
-Note that EDN::Reader is no longer `Enumerable`.
+Note that in contrast to earlier versions of this gem,
+EDN::Reader is no longer `Enumerable`.
 
-### Handing end of file
-
-By default, the read methods will throw an exception if you try to
-read the end of file:
-
-```ruby
-EDN.read("")
-
-#=> RuntimeError: Unexpected end of file
-```
-
-Alternatively you can specify a value for `read` to return when
-it hits the end of the data:
+Like `EDN.read`, `Reader.read` also takes an optional
+parameter, which is returned when there is no more data:
 
 ```ruby
-EDN.read("", :nomore)
-
-#=> :nomore
+r = EDN::Reader.new('1 2 3')
+r.read(:eof)  # returns 1
+r.read(:eof)  # returns 2
+r.read(:eof)  # returns 3
+r.read(:eof)  # returns :eof
 ```
 
-There is no problem using `nil` as an eof value.
+### Converting Ruby data to EDN
+
+To convert a data structure to an EDN string:
+
+```ruby
+data.to_edn
+```
+
+By default, this will work for strings, symbols, numbers, arrays, hashes, sets, nil, Time, and boolean values.
 
 ### Value Translations
 
