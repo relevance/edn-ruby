@@ -1,5 +1,6 @@
 require 'stringio'
 require 'set'
+require 'pry'
 
 
 module EDN
@@ -13,8 +14,43 @@ module EDN
 
   EOF = Object.new
 
+  # Reader table
 
-  @handlers = {}
+  READERS = {}
+  SYMBOL_INTERIOR_CHARS =
+    Set.new(%w{. # * ! - _ + ? $ % & = < > :} + ('a'..'z').to_a + ('A'..'Z').to_a + ('0'..'9').to_a)
+
+  SYMBOL_INTERIOR_CHARS.each {|n| READERS[n.to_s] = :read_symbol}
+
+  DIGITS = Set.new(('0'..'9').to_a)
+
+  DIGITS.each {|n| READERS[n.to_s] = :read_number}
+
+  READERS.default = :unknown
+
+  READERS['{'] = :read_map
+  READERS['['] = :read_vector
+  READERS['('] = :read_list
+  READERS['\\'] = :read_char
+  READERS['"'] = :read_string
+  READERS['.'] = :read_number_or_symbol
+  READERS['+'] = :read_number_or_symbol
+  READERS['-'] = :read_number_or_symbol
+  READERS[''] = :read_number_or_symbol
+  READERS['/'] = :read_slash
+  READERS[':'] = :read_keyword
+  READERS['#'] = :read_extension
+  READERS[:eof] = :read_eof
+
+  def self.register_reader(ch, handler=nil, &block)
+    if handler
+      READERS[ch] = handler
+    else
+      READERS[ch] = block
+    end
+  end
+
+  TAGS = {}
 
   def self.register(tag, func = nil, &block)
     if block_given?
@@ -26,18 +62,18 @@ module EDN
     end
 
     if func.is_a?(Class)
-      @tags[tag] = lambda { |*args| func.new(*args) }
+      TAGS[tag] = lambda { |*args| func.new(*args) }
     else
-      @tags[tag] = func
+      TAGS[tag] = func
     end
   end
 
   def self.unregister(tag)
-    @tags[tag] = nil
+    TAGS[tag] = nil
   end
 
   def self.tagged_element(tag, element)
-    func = @tags[tag]
+    func = TAGS[tag]
     if func
       func.call(element)
     else
@@ -45,31 +81,7 @@ module EDN
     end
   end
 
-
   class Parser
-    SYMBOL_INTERIOR_CHARS = Set.new(%w{. # * ! - _ + ? $ % & = < > :} + ('a'..'z').to_a + ('A'..'Z').to_a + ('0'..'9').to_a)
-    DIGITS = Set.new(('0'..'9').to_a)
-
-    READERS = {}
-
-    SYMBOL_INTERIOR_CHARS.each {|n| READERS[n.to_s] = :read_symbol}
-
-    READERS['{'] = :read_map
-    READERS['['] = :read_vector
-    READERS['('] = :read_list
-    READERS['\\'] = :read_char
-    READERS['"'] = :read_string
-    READERS['.'] = :read_number_or_symbol
-    READERS['+'] = :read_number_or_symbol
-    READERS['-'] = :read_number_or_symbol
-    READERS['/'] = :read_slash
-    READERS[':'] = :read_keyword
-    READERS['#'] = :read_extension
-    READERS[:eof] = :read_eof
-    DIGITS.each {|n| READERS[n.to_s] = :read_number}
-
-    READERS.default = :unknown
-
     def initialize(source, *extra)
       io = source.instance_of?(String) ? StringIO.new(source) : source
       @s = CharStream.new(io)
@@ -209,13 +221,21 @@ module EDN
       result
     end
 
+    def call_reader(reader)
+      if reader.instance_of? Symbol
+        self.send(reader)
+      else
+        self.instance_exec(&reader)
+      end
+    end
+
     def read_basic
       @s.skip_ws
       ch = @s.current
-      result = self.send(READERS[ch])
+      result = call_reader(READERS[ch])
       while result == NOTHING
         @s.skip_ws
-        result = self.send(READERS[@s.current])
+        result = call_reader(READERS[@s.current])
       end
       result
     end
