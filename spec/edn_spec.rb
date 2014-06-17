@@ -57,6 +57,7 @@ describe EDN do
 
     it "reads vectors" do
       EDN.read('[]').should == []
+      EDN.read('()').should be_a(Array)
       EDN.read('[1]').should == [1]
       EDN.read('["hello" 1 2]').should == ['hello', 1, 2]
       EDN.read('[[1 [:hi]]]').should == [[1, [:hi]]]
@@ -64,6 +65,7 @@ describe EDN do
 
     it "reads lists" do
       EDN.read('()').should == []
+      EDN.read('()').should be_a(EDN::Type::List)
       EDN.read('(1)').should == [1]
       EDN.read('("hello" 1 2)').should == ['hello', 1, 2]
       EDN.read('((1 (:hi)))').should == [[1, [:hi]]]
@@ -71,6 +73,7 @@ describe EDN do
 
     it "reads maps" do
       EDN.read('{}').should == {}
+      EDN.read('{}').should be_a(Hash)
       EDN.read('{:a :b}').should == {:a => :b}
       EDN.read('{:a 1, :b 2}').should == {:a => 1, :b => 2}
       EDN.read('{:a {:b :c}}').should == {:a => {:b => :c}}

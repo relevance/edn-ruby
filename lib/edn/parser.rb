@@ -303,7 +303,7 @@ module EDN
 
     def read_list
       @s.advance
-      read_collection(Array, ')')
+      read_collection(EDN::Type::List, ')')
     end
 
     def read_vector
