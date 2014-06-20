@@ -145,7 +145,13 @@ describe EDN do
       elements = rant(RantlyHelpers::ELEMENT)
       elements.each do |element|
         ruby_element = EDN.read(element)
-        ruby_element.should == EDN.read(ruby_element.to_edn)
+
+        if ruby_element.kind_of?(Numeric)
+          ruby_element.should be_within(0.1).of(EDN.read(ruby_element.to_edn))
+        else
+          ruby_element.should == EDN.read(ruby_element.to_edn)
+        end
+
         if ruby_element.respond_to?(:metadata)
           ruby_element.metadata.should == EDN.read(ruby_element.to_edn).metadata
         end
