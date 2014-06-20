@@ -63,6 +63,11 @@ describe EDN do
       EDN.read('[[1 [:hi]]]').should == [[1, [:hi]]]
     end
 
+    it "reads tagged elements" do
+      EDN.read('#inst "2012-09-10T16:16:03-04:00"').should == DateTime.rfc3339("2012-09-10T16:16:03-04:00")
+      EDN.read('#uuid "f81d4fae-7dec-11d0-a765-00a0c91e6bf6"').should == "f81d4fae-7dec-11d0-a765-00a0c91e6bf6"
+    end
+
     it "reads lists" do
       EDN.read('()').should == []
       EDN.read('()').should be_a(EDN::Type::List)
