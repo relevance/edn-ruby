@@ -2,11 +2,12 @@
 require File.expand_path('../lib/edn/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.authors       = ["Clinton N. Dreisbach"]
-  gem.email         = ["clinton@thinkrelevance.com"]
+  gem.authors       = ["Clinton N. Dreisbach & Russ Olsen"]
+  gem.email         = ["russ@russolsen.com"]
   gem.description   = %q{'edn implements a reader for Extensible Data Notation by Rich Hickey.'}
   gem.summary       = gem.description
   gem.homepage      = "https://github.com/relevance/edn-ruby"
+  gem.license       = "MIT"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
@@ -15,7 +16,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = EDN::VERSION
 
-  gem.add_dependency 'parslet', '~> 1.4.0'
   gem.add_development_dependency 'pry', '~> 0.9.10'
   gem.add_development_dependency 'rspec', '~> 2.11.0'
   gem.add_development_dependency 'rantly', '~> 0.3.1'

@@ -2,32 +2,16 @@ $:.push(File.dirname(__FILE__))
 require 'edn/version'
 require 'edn/core_ext'
 require 'edn/types'
+require 'edn/metadata'
+require 'edn/char_stream'
 require 'edn/parser'
-require 'edn/transform'
 require 'edn/reader'
 
 module EDN
-  class ParseFailed < StandardError
-    attr_reader :original_exception
-
-    def initialize(message, original_exception)
-      super(message)
-      @original_exception = original_exception
-    end
-  end
-
-  @parser = EDN::Parser.new
-  @transform = EDN::Transform.new
   @tags = Hash.new
 
-  def self.read(edn)
-    begin
-      tree = @parser.parse(edn)
-    rescue Parslet::ParseFailed => error
-      message = "Invalid EDN, cannot parse: #{edn}"
-      raise ParseFailed.new(message, error)
-    end
-    @transform.apply(tree)
+  def self.read(edn, eof_value=NOTHING)
+    EDN::Reader.new(edn).read(eof_value)
   end
 
   def self.register(tag, func = nil, &block)

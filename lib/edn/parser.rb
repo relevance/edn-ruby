@@ -1,205 +1,337 @@
-require 'parslet'
-require 'parslet/ignore'
+require 'stringio'
+require 'set'
+require 'pry'
+
 
 module EDN
-  class Parser < Parslet::Parser
 
-    def parse_prefix(str, options={})
-      source = Parslet::Source.new(str.to_s)
-      success, value = setup_and_apply(source, nil)
+  # Object returned when there is nothing to return
 
-      unless success
-        reporter = options[:reporter] || Parslet::ErrorReporter::Tree.new
-        success, value = setup_and_apply(source, reporter)
+  NOTHING = Object.new
 
-        fail "Assertion failed: success was true when parsing with reporter" if success
-        value.raise
-      end
+  # Object to return when we hit end of file. Cant be nil or :eof
+  # because either of those could be something in the EDN data.
 
-      rest = nil
-      if !source.eof?
-        rest = source.consume(source.chars_left).to_s
-      end
+  EOF = Object.new
 
-      return [flatten(value), rest]
+  # Reader table
+
+  READERS = {}
+  SYMBOL_INTERIOR_CHARS =
+    Set.new(%w{. # * ! - _ + ? $ % & = < > :} + ('a'..'z').to_a + ('A'..'Z').to_a + ('0'..'9').to_a)
+
+  SYMBOL_INTERIOR_CHARS.each {|n| READERS[n.to_s] = :read_symbol}
+
+  DIGITS = Set.new(('0'..'9').to_a)
+
+  DIGITS.each {|n| READERS[n.to_s] = :read_number}
+
+  READERS.default = :unknown
+
+  READERS['{'] = :read_map
+  READERS['['] = :read_vector
+  READERS['('] = :read_list
+  READERS['\\'] = :read_char
+  READERS['"'] = :read_string
+  READERS['.'] = :read_number_or_symbol
+  READERS['+'] = :read_number_or_symbol
+  READERS['-'] = :read_number_or_symbol
+  READERS[''] = :read_number_or_symbol
+  READERS['/'] = :read_slash
+  READERS[':'] = :read_keyword
+  READERS['#'] = :read_extension
+  READERS[:eof] = :read_eof
+
+  def self.register_reader(ch, handler=nil, &block)
+    if handler
+      READERS[ch] = handler
+    else
+      READERS[ch] = block
+    end
+  end
+
+  TAGS = {}
+
+  def self.register(tag, func = nil, &block)
+    if block_given?
+      func = block
     end
 
-    root(:top)
+    if func.nil?
+      func = lambda { |x| x }
+    end
 
-    rule(:top) {
-      space? >> element >> space?
-    }
+    if func.is_a?(Class)
+      TAGS[tag] = lambda { |*args| func.new(*args) }
+    else
+      TAGS[tag] = func
+    end
+  end
 
-    rule(:element) {
-      base_element |
-      tagged_element |
-      metadata.maybe >> metadata_capable_element.as(:element)
-    }
+  def self.unregister(tag)
+    TAGS[tag] = nil
+  end
 
-    rule(:metadata_capable_element) {
-      vector |
-      list |
-      set |
-      map |
-      symbol
-    }
+  def self.tagged_element(tag, element)
+    func = TAGS[tag]
+    if func
+      func.call(element)
+    else
+      EDN::Type::Unknown.new(tag, element)
+    end
+  end
 
-    rule(:tagged_element) {
-      tag >> space? >> base_element.as(:element)
-    }
+  class Parser
+    def initialize(source, *extra)
+      io = source.instance_of?(String) ? StringIO.new(source) : source
+      @s = CharStream.new(io)
+    end
 
-    rule(:base_element) {
-      vector |
-      list |
-      set |
-      map |
-      boolean |
-      _nil |
-      keyword |
-      string |
-      character |
-      float |
-      integer |
-      symbol
-    }
+    def read
+      meta = read_meta
+      value = read_basic
+      if meta
+        value.extend EDN::Metadata
+        value.metadata = meta
+      end
+      value
+    end
 
-    # Collections
+    def eof?
+      @s.eof?
+    end
 
-    rule(:vector) {
-      str('[') >>
-      top.repeat.as(:vector) >>
-      space? >>
-      str(']')
-    }
+    def unknown
+      raise "Don't know what to do with #{@s.current} #{@s.current.class}"
+    end
 
-    rule(:list) {
-      str('(') >>
-      top.repeat.as(:list) >>
-      space? >>
-      str(')')
-    }
+    def read_eof
+      EOF
+    end
 
-    rule(:set) {
-      str('#{') >>
-      top.repeat.as(:set) >>
-      space? >>
-      str('}')
-    }
+    def read_char
+      result = @s.advance
+      @s.advance
+      until @s.eof?
+        break unless @s.digit? || @s.alpha?
+        result += @s.current
+        @s.advance
+      end
 
-    rule(:map) {
-      str('{') >>
-      (top.as(:key) >> top.as(:value)).repeat.as(:map) >>
-      space? >>
-      str('}')
-    }
+      return result if result.size == 1
 
-    # Primitives
+      case result
+      when 'newline'
+        "\n"
+      when 'return'
+        "\r"
+      when 'tab'
+        "\t"
+      when 'space'
+        " "
+      else
+        raise "Unknown char #{result}"
+      end
+    end
 
-    rule(:integer) {
-      (match['\-\+'].maybe >>
-       (str('0') | match('[1-9]') >> digit.repeat)).as(:integer) >>
-      (str('N') | str("M") ).maybe.as(:precision)
-    }
+    def read_slash
+      @s.advance
+      Type::Symbol.new('/')
+    end
 
-    rule(:float) {
-      (match['\-\+'].maybe >>
-       (str('0') | (match('[1-9]') >> digit.repeat)) >>
-       str('.') >> digit.repeat(1) >>
-       (match('[eE]') >> match('[\-+]').maybe >> digit.repeat).maybe).as(:float) >>
-      str('M').maybe.as(:precision)
-    }
+    def read_number_or_symbol
+      leading = @s.current
+      @s.advance
+      return read_number(leading) if @s.digit?
+      read_symbol(leading)
+    end
 
-    rule(:string) {
-      str('"') >>
-      (str('\\') >> any | str('"').absent? >> any).repeat.as(:string) >>
-      str('"')
-    }
+    def read_symbol_chars
+      result = ''
 
-    rule(:character) {
-      str("\\") >>
-      (str('newline') | str('space') | str('tab') | str('return') |
-       match['[:graph:]']).as(:character)
-    }
+      ch = @s.current
+      while SYMBOL_INTERIOR_CHARS.include?(ch)
+        result << ch
+        ch = @s.advance
+      end
+      return result unless @s.skip_past('/')
 
-    rule(:keyword) {
-      str(':') >> symbol.as(:keyword)
-    }
+      result << '/'
+      ch = @s.current
+      while SYMBOL_INTERIOR_CHARS.include?(ch)
+        result << ch
+        ch = @s.advance
+      end
 
-    rule(:symbol) {
-      (symbol_chars >> (str('/') >> symbol_chars).maybe |
-       str('/')).as(:symbol)
-    }
+      result
+    end
 
-    rule(:boolean) {
-      (str('true').as(:true) | str('false').as(:false)) >> valid_chars.absent?
-    }
+    def read_extension
+      @s.advance
+      if @s.current == '{'
+        @s.advance
+        read_collection(Set, '}')
+      elsif @s.current == "_"
+        @s.advance
+        x = read
+        NOTHING
+      else
+        tag = read_symbol_chars
+        value = read
+        EDN.tagged_element(tag, value)
+      end
+    end
 
-    rule(:_nil) {
-      str('nil').as(:nil) >> valid_chars.absent?
-    }
+    def read_symbol(leading='')
+      token = leading + read_symbol_chars
+      return true if token == "true"
+      return false if token == "false"
+      return nil if token == "nil"
+      Type::Symbol.new(token)
+    end
 
-    # Parts
+    def read_keyword
+      @s.advance
+      read_symbol_chars.to_sym
+    end
 
-    rule(:metadata) {
-      ((metadata_map | metadata_symbol | metadata_keyword) >> space?).repeat.as(:metadata)
-    }
+    def escape_char(ch)
+      return '\\' if ch == '\\'
+      return "\n" if ch == 'n'
+      return "\t" if ch == 't'
+      return "\r" if ch == 'r'
+      ch
+    end
 
-    rule(:metadata_map) {
-      str('^{') >>
-      ((keyword | symbol | string).as(:key) >> top.as(:value)).repeat.as(:map) >>
-      space? >>
-      str('}')
-    }
+    def read_string
+      @s.advance
 
-    rule(:metadata_symbol) {
-      str('^') >> symbol
-    }
+      result = ''
+      until @s.current == '"'
+        raise "Unexpected eof" if @s.eof?
+        if @s.current == '\\'
+          @s.advance
+          result << escape_char(@s.current)
+        else
+          result << @s.current
+        end
+        @s.advance
+      end
+      @s.advance
+      result
+    end
 
-    rule(:metadata_keyword) {
-      str('^') >> keyword
-    }
+    def call_reader(reader)
+      if reader.instance_of? Symbol
+        self.send(reader)
+      else
+        self.instance_exec(&reader)
+      end
+    end
 
-    rule(:tag) {
-      str('#') >> match['[:alpha:]'].present? >> symbol.as(:tag)
-    }
+    def read_basic
+      @s.skip_ws
+      ch = @s.current
+      result = call_reader(READERS[ch])
+      while result == NOTHING
+        @s.skip_ws
+        result = call_reader(READERS[@s.current])
+      end
+      result
+    end
+  
+    def read_digits(min_digits=0)
+      result = ''
 
-    rule(:symbol_chars) {
-      (symbol_first_char >>
-       valid_chars.repeat) |
-      match['\-\+\.']
-    }
+      if @s.current == '+' || @s.current == '-'
+        result << @s.current
+        @s.advance
+      end
+ 
+      n_digits = 0
+      while @s.current =~ /[0-9]/
+        n_digits += 1
+        result << @s.current
+        @s.advance
+      end
 
-    rule(:symbol_first_char) {
-      (match['\-\+\.'] >> match['0-9'].absent? |
-       match['\#\:0-9'].absent?) >> valid_chars
-    }
+      raise "Expected at least #{min_digits} digits, found #{result}" unless n_digits >= min_digits
+      result
+    end
 
-    rule(:valid_chars) {
-      match['[:alnum:]'] | sym_punct
-    }
+    def finish_float(whole_part)
+      result = whole_part
+      result += @s.skip_past('.', 'Expected .')
+      result += read_digits(1)
+      if @s.current == 'e' || @s.current == 'E'
+        @s.advance
+        result = result + 'e' + read_digits
+      end
+      result.to_f 
+    end
 
-    rule(:sym_punct) {
-      match['\.\*\+\!\-\?\$_%&=:#']
-    }
+    def read_number(leading='')
+      result = leading + read_digits
 
-    rule(:digit) {
-      match['0-9']
-    }
+      if @s.current == '.'
+        return finish_float(result)
+      elsif @s.skip_past('M') || @s.skip_past('N')
+        result.to_i
+      else
+        result.to_i
+      end
+    end
 
-    rule(:newline) { str("\r").maybe >> str("\n") }
+    def read_meta
+      raw_metadata = []
+      @s.skip_ws
+      while @s.current == '^'
+        @s.advance
+        raw_metadata << read_basic
+        @s.skip_ws
+      end
 
-    rule(:comment) {
-      str(';') >> (newline.absent? >> any).repeat
-    }
+      metadata = raw_metadata.reverse.reduce({}) do |acc, m|
+        case m
+        when Symbol then acc.merge(m => true)
+        when EDN::Type::Symbol then acc.merge(:tag => m)
+        else acc.merge(m)
+        end
+      end
+      metadata.empty? ? nil : metadata
+    end
 
-    rule(:discard) {
-      str('#_') >> space? >> (tagged_element | base_element).ignore
-    }
+    def read_list
+      @s.advance
+      read_collection(EDN::Type::List, ')')
+    end
 
-    rule(:space) {
-      (discard | comment | match['\s,']).repeat(1)
-    }
+    def read_vector
+      @s.advance
+      read_collection(Array, ']')
+    end
 
-    rule(:space?) { space.maybe }
+    def read_map
+      @s.advance
+      array = read_collection(Array, '}')
+      raise "Need an even number of items for a map" unless array.count.even?
+      Hash[*array]
+    end
+
+    def read_collection(clazz, closing)
+      result = clazz.new
+
+      @s.skip_ws
+
+      ch = @s.current
+      while ch != closing
+        raise "Unexpected eof" if ch == :eof
+        result << read
+        @s.skip_ws
+        ch = @s.current
+      end
+      @s.advance
+      result
+    end
   end
 end

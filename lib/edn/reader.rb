@@ -1,36 +1,23 @@
 module EDN
   class Reader
-    include Enumerable
 
-    def initialize(text)
-      @parser = Parser.new
-      @transform = Transform.new
-      @original_text = text
-      @text = text
+    def initialize(source)
+      @parser = Parser.new(source)
     end
 
-    def eof?
-      @text.nil? || @text.empty?
+    def read(eof_value = NOTHING)
+      result = @parser.read
+      if result == EOF 
+        raise "Unexpected end of file" if eof_value == NOTHING
+        return eof_value
+      end
+      result
     end
 
     def each
-      reset!
-      return enum_for(:select) unless block_given?
-
-      until eof?
-        yield read
+      until (result = @parser.read) == EOF
+        yield result
       end
-    end
-
-    def reset!
-      @text = @original_text
-    end
-
-    def read
-      raise "EDN::Reader is out of string!" if eof?
-      element, rest = @parser.parse_prefix(@text)
-      @text = rest
-      @transform.apply(element)
     end
   end
 end
