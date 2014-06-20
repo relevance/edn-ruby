@@ -3,10 +3,11 @@ require File.expand_path('../lib/edn/version', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.authors       = ["Clinton N. Dreisbach & Russ Olsen"]
-  gem.email         = ["clinton@thinkrelevance.com"]
+  gem.email         = ["russ@russolsen.com"]
   gem.description   = %q{'edn implements a reader for Extensible Data Notation by Rich Hickey.'}
   gem.summary       = gem.description
-  gem.homepage      = ""
+  gem.homepage      = "https://github.com/relevance/edn-ruby"
+  gem.license       = "MIT"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
