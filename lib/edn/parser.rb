@@ -1,6 +1,5 @@
 require 'stringio'
 require 'set'
-require 'pry'
 
 
 module EDN
