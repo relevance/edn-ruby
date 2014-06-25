@@ -33,7 +33,7 @@ module RantlyHelpers
 
   PLAIN_SYMBOL = lambda { |_|
     sized(range(1, 100)) {
-      s = string(/[[:alnum:]]|[\.\*\+\!\-\?\$_%&=:#]/)
+      s = string(/[[:alnum:]]|[\.\*\+\!\-\?\$_%<>&=:#]/)
       guard s !~ /^[0-9]/
       guard s !~ /^[\+\-\.][0-9]/
       guard s !~ /^[\:\#]/

@@ -40,9 +40,12 @@ describe EDN do
       EDN.read("3.14").should == 3.14
       EDN.read("3.14M").should == BigDecimal("3.14")
       EDN.read('"hello\nworld"').should == "hello\nworld"
+      EDN.read('"øhi utf8"').should ==  "øhi utf8"
       EDN.read(':hello').should == :hello
       EDN.read(':hello/world').should == :"hello/world"
       EDN.read('hello').should == EDN::Type::Symbol.new('hello')
+      EDN.read('<').should == EDN::Type::Symbol.new('<')
+      EDN.read('>').should == EDN::Type::Symbol.new('>')
       EDN.read('hello/world').should == EDN::Type::Symbol.new('hello/world')
       EDN.read('true').should == true
       EDN.read('false').should == false
