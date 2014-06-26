@@ -232,7 +232,7 @@ module EDN
       @s.skip_ws
       ch = @s.current
       result = call_reader(READERS[ch])
-      while result == NOTHING
+      while NOTHING.equal?(result)
         @s.skip_ws
         result = call_reader(READERS[@s.current])
       end
