@@ -260,19 +260,27 @@ module EDN
 
     def finish_float(whole_part)
       result = whole_part
-      result += @s.skip_past('.', 'Expected .')
-      result += read_digits(1)
+
+      if @s.current == '.'
+        result += '.'
+        @s.advance
+        result = @s.digit? ? result + read_digits : result + '0'
+        #puts "aaa: #{result}"
+      end
+
       if @s.current == 'e' || @s.current == 'E'
         @s.advance
         result = result + 'e' + read_digits
+        #puts "bbb: #{result}"
       end
+      #puts result
       result.to_f 
     end
 
     def read_number(leading='')
       result = leading + read_digits
 
-      if @s.current == '.'
+      if %w{. e E}.include? @s.current
         return finish_float(result)
       elsif @s.skip_past('M') || @s.skip_past('N')
         result.to_i

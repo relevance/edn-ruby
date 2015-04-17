@@ -38,6 +38,10 @@ describe EDN do
       EDN.read(%q{""}).should == ""
       EDN.read("1").should == 1
       EDN.read("3.14").should == 3.14
+      EDN.read("3.0e10").should == 3.0e10
+      EDN.read("3.e10").should == 3.0e10
+      EDN.read("3e10").should == 3.0e10
+      EDN.read("3.14M").should == BigDecimal("3.14")
       EDN.read("3.14M").should == BigDecimal("3.14")
       EDN.read('"hello\nworld"').should == "hello\nworld"
       EDN.read('"øhi utf8"').should ==  "øhi utf8"
