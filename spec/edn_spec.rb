@@ -38,11 +38,13 @@ describe EDN do
       EDN.read(%q{""}).should == ""
       EDN.read("1").should == 1
       EDN.read("3.14").should == 3.14
+
       EDN.read("3.0e10").should == 3.0e10
       EDN.read("3.e10").should == 3.0e10
       EDN.read("3e10").should == 3.0e10
       EDN.read("3.14M").should == BigDecimal("3.14")
       EDN.read("3.14M").should == BigDecimal("3.14")
+
       EDN.read('"hello\nworld"').should == "hello\nworld"
       EDN.read('"øhi utf8"').should ==  "øhi utf8"
       EDN.read(':hello').should == :hello
@@ -55,6 +57,16 @@ describe EDN do
       EDN.read('false').should == false
       EDN.read('nil').should == nil
       EDN.read('\c').should == "c"
+    end
+
+    it 'supports varations of numbers with exponents' do
+      EDN.read("3.0e+10").should == 3.0e10
+      EDN.read("3.e+10").should == 3.0e10
+      EDN.read("3e+10").should == 3.0e10
+
+      EDN.read("3.0e-10").should == 3.0e-10
+      EDN.read("3.e-10").should == 3.0e-10
+      EDN.read("3e-10").should == 3.0e-10
     end
 
     it "should support M suffix without decimals"  do
