@@ -33,6 +33,25 @@ describe EDN do
     end
   end
 
+  context "skipping values" do
+    it 'supports discarding the next value' do
+      EDN.read('#_123 4').should == 4
+      EDN.read('#_ 123 4').should == 4
+      EDN.read('#_    123 4').should == 4
+      EDN.read('#_    123   74').should == 74
+
+      EDN.read('[#_1]').should == []
+      EDN.read('[#_1 #_"hello"]').should == []
+      EDN.read('[#_64 1 #_ 65]').should == [1]
+      EDN.read('[#_ "hello" 1 2]').should == [1, 2]
+    end
+
+    it 'treats a skip like its not there' do
+      expect { EDN.read('#_"fooo"') }.to raise_error
+      EDN.read('#_64', :eof).should == :eof
+    end
+  end
+
   context "reading data" do
     it "reads single elements" do
       EDN.read(%q{""}).should == ""

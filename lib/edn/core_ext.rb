@@ -34,7 +34,11 @@ module EDN
       end
 
       def to_edn
-        self.inspect
+        result = chars.reduce('"') do |result, ch|
+          result += '\\' if %w{" \\}.include?(ch)
+          result + ch
+        end
+        result + '"'
       end
     end
 

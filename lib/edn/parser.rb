@@ -86,10 +86,10 @@ module EDN
       @s = CharStream.new(io)
     end
 
-    def read
+    def read(return_nothing=false)
       meta = read_meta
-      value = read_basic
-      if meta
+      value = read_basic(return_nothing)
+      if meta && value != NOTHING
         value.extend EDN::Metadata
         value.metadata = meta
       end
@@ -228,14 +228,15 @@ module EDN
       end
     end
 
-    def read_basic
+    def read_basic(return_nothing=false)
       @s.skip_ws
       ch = @s.current
       result = call_reader(READERS[ch])
-      while NOTHING.equal?(result)
+      while NOTHING.equal?(result) && !return_nothing
         @s.skip_ws
         result = call_reader(READERS[@s.current])
       end
+
       result
     end
   
@@ -328,14 +329,12 @@ module EDN
     def read_collection(clazz, closing)
       result = clazz.new
 
-      @s.skip_ws
-
-      ch = @s.current
-      while ch != closing
-        raise "Unexpected eof" if ch == :eof
-        result << read
+      while true
         @s.skip_ws
-        ch = @s.current
+        raise "Unexpected eof" if @s.eof?
+        break if @s.current == closing
+        next_value = read(true)
+        result << next_value unless next_value == NOTHING
       end
       @s.advance
       result
