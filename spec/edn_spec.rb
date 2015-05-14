@@ -4,6 +4,28 @@ require 'stringio'
 describe EDN do
   include RantlyHelpers
 
+  ExemplarPattern = "#{File.dirname(__FILE__)}/exemplars/*.edn"
+
+  context 'Exemplar' do
+    edn_files = Dir[ExemplarPattern]
+    edn_files.each do |edn_file|
+      rb_file = edn_file.sub(/\.edn$/, '.rb')
+      it "reads file #{File.basename(edn_file)} correctly" do
+        expected = eval(File.read(rb_file))
+        actual = EDN.read(File.read(edn_file))
+        actual.should == expected
+      end
+
+       it "round trips the value in #{File.basename(edn_file)} correctly" do
+        expected = eval(File.read(rb_file))
+        actual = EDN.read(File.read(edn_file))
+        round_trip = EDN.read(actual.to_edn)
+        round_trip.should == expected
+      end
+    end
+  end
+
+
   context "#read" do
     it "reads from a stream" do
       io = StringIO.new("123")
@@ -33,102 +55,7 @@ describe EDN do
     end
   end
 
-  context "skipping values" do
-    it 'supports discarding the next value' do
-      EDN.read('#_123 4').should == 4
-      EDN.read('#_ 123 4').should == 4
-      EDN.read('#_    123 4').should == 4
-      EDN.read('#_    123   74').should == 74
-
-      EDN.read('[#_1]').should == []
-      EDN.read('[#_1 #_"hello"]').should == []
-      EDN.read('[#_64 1 #_ 65]').should == [1]
-      EDN.read('[#_ "hello" 1 2]').should == [1, 2]
-    end
-
-    it 'treats a skip like its not there' do
-      expect { EDN.read('#_"fooo"') }.to raise_error
-      EDN.read('#_64', :eof).should == :eof
-    end
-  end
-
   context "reading data" do
-    it "reads single elements" do
-      EDN.read(%q{""}).should == ""
-      EDN.read("1").should == 1
-      EDN.read("3.14").should == 3.14
-
-      EDN.read("3.0e10").should == 3.0e10
-      EDN.read("3.e10").should == 3.0e10
-      EDN.read("3e10").should == 3.0e10
-      EDN.read("3.14M").should == BigDecimal("3.14")
-      EDN.read("3.14M").should == BigDecimal("3.14")
-
-      EDN.read('"hello\nworld"').should == "hello\nworld"
-      EDN.read('"øhi utf8"').should ==  "øhi utf8"
-      EDN.read(':hello').should == :hello
-      EDN.read(':hello/world').should == :"hello/world"
-      EDN.read('hello').should == EDN::Type::Symbol.new('hello')
-      EDN.read('<').should == EDN::Type::Symbol.new('<')
-      EDN.read('>').should == EDN::Type::Symbol.new('>')
-      EDN.read('hello/world').should == EDN::Type::Symbol.new('hello/world')
-      EDN.read('true').should == true
-      EDN.read('false').should == false
-      EDN.read('nil').should == nil
-      EDN.read('\c').should == "c"
-    end
-
-    it 'supports varations of numbers with exponents' do
-      EDN.read("3.0e+10").should == 3.0e10
-      EDN.read("3.e+10").should == 3.0e10
-      EDN.read("3e+10").should == 3.0e10
-
-      EDN.read("3.0e-10").should == 3.0e-10
-      EDN.read("3.e-10").should == 3.0e-10
-      EDN.read("3e-10").should == 3.0e-10
-    end
-
-    it "should support M suffix without decimals"  do
-      EDN.read(123412341231212121241234.to_edn).should == 123412341231212121241234
-      EDN.read("123412341231212121241234M").should == 123412341231212121241234
-    end
-
-    it "reads vectors" do
-      EDN.read('[]').should == []
-      EDN.read('()').should be_a(Array)
-      EDN.read('[1]').should == [1]
-      EDN.read('["hello" 1 2]').should == ['hello', 1, 2]
-      EDN.read('[[1 [:hi]]]').should == [[1, [:hi]]]
-    end
-
-    it "reads tagged elements" do
-      EDN.read('#inst "2012-09-10T16:16:03-04:00"').should == DateTime.rfc3339("2012-09-10T16:16:03-04:00")
-      EDN.read('#uuid "f81d4fae-7dec-11d0-a765-00a0c91e6bf6"').should == "f81d4fae-7dec-11d0-a765-00a0c91e6bf6"
-    end
-
-    it "reads lists" do
-      EDN.read('()').should == []
-      EDN.read('()').should be_a(EDN::Type::List)
-      EDN.read('(1)').should == [1]
-      EDN.read('("hello" 1 2)').should == ['hello', 1, 2]
-      EDN.read('((1 (:hi)))').should == [[1, [:hi]]]
-    end
-
-    it "reads maps" do
-      EDN.read('{}').should == {}
-      EDN.read('{}').should be_a(Hash)
-      EDN.read('{:a :b}').should == {:a => :b}
-      EDN.read('{:a 1, :b 2}').should == {:a => 1, :b => 2}
-      EDN.read('{:a {:b :c}}').should == {:a => {:b => :c}}
-    end
-
-    it "reads sets" do
-      EDN.read('#{}').should == Set.new
-      EDN.read('#{1}').should == Set[1]
-      EDN.read('#{1 "abc"}').should == Set[1, "abc"]
-      EDN.read('#{1 #{:abc}}').should == Set[1, Set[:abc]]
-    end
-
     it "reads any valid element" do
       elements = rant(RantlyHelpers::ELEMENT)
       elements.each do |element|
@@ -142,20 +69,6 @@ describe EDN do
           puts "Bad element: #{element}"
           raise ex
         end
-      end
-    end
-
-    context "allows symbols starting with a reserved word" do
-      it "reads true-foo" do
-        EDN.read('true-foo').should == EDN::Type::Symbol.new('true-foo')
-      end
-
-      it "reads falsey" do
-        EDN.read('falsey').should == EDN::Type::Symbol.new('falsey')
-      end
-
-      it "reads nillable" do
-       EDN.read('nillable').should == EDN::Type::Symbol.new('nillable')
       end
     end
   end
