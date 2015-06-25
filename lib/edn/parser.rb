@@ -253,14 +253,7 @@ module EDN
         @s.skip_ws
       end
 
-      metadata = raw_metadata.reverse.reduce({}) do |acc, m|
-        case m
-        when Symbol then acc.merge(m => true)
-        when EDN::Type::Symbol then acc.merge(:tag => m)
-        else acc.merge(m)
-        end
-      end
-      metadata.empty? ? nil : metadata
+      EDN.resolve_metadata(raw_metadata)
     end
 
     def read_list

@@ -1,6 +1,7 @@
 $:.push(File.dirname(__FILE__))
 require 'edn/version'
 require 'edn/constants'
+require 'edn/utils'
 require 'edn/tags'
 require 'edn/core_ext'
 require 'edn/types'
