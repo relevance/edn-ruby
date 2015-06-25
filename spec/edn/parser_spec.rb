@@ -3,6 +3,12 @@ require 'spec_helper'
 describe EDN::Parser do
   include RantlyHelpers
 
+  DELTA_FACTOR = 0.000000000000001
+
+  def delta_for(x)
+    (x * DELTA_FACTOR).abs
+  end
+
   let(:parser) { EDN::Parser.new }
 
   it "can contain comments" do
@@ -40,19 +46,22 @@ describe EDN::Parser do
   context "float" do
     it "should consume simple floats" do
       rant(RantlyHelpers::FLOAT).each do |float|
-        EDN.read(float.to_s).should == float.to_f
+        f = float.to_f
+        EDN.read(float).should be_within(delta_for(f)).of(f)
       end
     end
 
     it "should consume floats with exponents" do
       rant(RantlyHelpers::FLOAT_WITH_EXP).each do |float|
-        EDN.read(float.to_s).should == float.to_f
+        f = float.to_f
+        EDN.read(float).should be_within(delta_for(f)).of(f)
       end
     end
 
     it "should consume floats prefixed with a +" do
       rant(RantlyHelpers::FLOAT).each do |float|
-        EDN.read("+#{float.to_f.abs.to_s}").should == float.to_f.abs
+        f = float.to_f.abs
+        EDN.read("+#{f.to_s}").should be_within(delta_for(f)).of(f)
       end
     end
   end
