@@ -214,22 +214,28 @@ module EDN
     end
 
     def finish_float(whole_part)
-      result = whole_part
+      value = whole_part
 
       if @s.current == '.'
-        result += '.'
+        value += '.'
         @s.advance
-        result = @s.digit? ? result + read_digits : result + '0'
+        value = @s.digit? ? value + read_digits : value + '0'
         #puts "aaa: #{result}"
       end
 
       if @s.current == 'e' || @s.current == 'E'
         @s.advance
-        result = result + 'e' + read_digits
-        #puts "bbb: #{result}"
+        value = value + 'e' + read_digits
       end
-      #puts result
-      result.to_f 
+
+      result = nil
+      if @s.current == 'M'
+        @s.advance
+        result = BigDecimal.new(value)
+      else
+        result = value.to_f
+      end
+      result
     end
 
     def read_number(leading='')
@@ -237,7 +243,7 @@ module EDN
 
       if %w{. e E}.include? @s.current
         return finish_float(result)
-      elsif @s.skip_past('M') || @s.skip_past('N')
+      elsif @s.skip_past('N')
         result.to_i
       else
         result.to_i
@@ -269,6 +275,7 @@ module EDN
     def read_map
       @s.advance
       array = read_collection(Array, '}')
+      p array unless array.count.even?
       raise "Need an even number of items for a map" unless array.count.even?
       Hash[*array]
     end

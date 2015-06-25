@@ -64,6 +64,16 @@ describe EDN::Parser do
         EDN.read("+#{f.to_s}").should be_within(delta_for(f)).of(f)
       end
     end
+
+    it "should consume exact floats" do
+      rant(RantlyHelpers::EXACT_FLOAT).each do |float|
+        f = BigDecimal.new(float)
+        x = EDN.read(float)
+        x.should be_a(BigDecimal)
+        x.should be_within(delta_for(f)).of(f)
+      end
+    end
+
   end
 
   context "symbol" do

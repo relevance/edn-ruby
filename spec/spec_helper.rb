@@ -63,6 +63,10 @@ module RantlyHelpers
     join("")
   }
 
+  EXACT_FLOAT = lambda { |_|
+    [call(FLOAT), "M"].join("")
+  }
+
   RUBY_CHAR = lambda { |_|
     "\\" +
     sized(1) {
@@ -118,6 +122,7 @@ module RantlyHelpers
     branch(INTEGER,
            FLOAT,
            FLOAT_WITH_EXP,
+           EXACT_FLOAT,
            STRING,
            KEYWORD,
            SYMBOL,
