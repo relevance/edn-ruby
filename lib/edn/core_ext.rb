@@ -34,11 +34,14 @@ module EDN
       end
 
       def to_edn
-        result = chars.reduce('"') do |result, ch|
-          result += '\\' if %w{" \\}.include?(ch)
-          result + ch
+        array = chars.map do |ch|
+          if %w{" \\}.include?(ch)
+            '\\' + ch
+          else
+            ch
+          end
         end
-        result + '"'
+        '"' + array.join + '"'
       end
     end
 
