@@ -1,4 +1,5 @@
 $:.push(File.dirname(__FILE__))
+require 'set'
 require 'edn/version'
 require 'edn/core_ext'
 require 'edn/types'
@@ -6,6 +7,8 @@ require 'edn/metadata'
 require 'edn/char_stream'
 require 'edn/parser'
 require 'edn/reader'
+
+puts "LOcal edn"
 
 module EDN
   @tags = Hash.new
@@ -54,6 +57,14 @@ module EDN
   def self.list(*values)
     EDN::Type::List.new(*values)
   end
+
+  def self.set(*elems)
+    Set.new(*elems)
+  end
+
+  def self.big_decimal(str)
+    BigDecimal.new(str)
+  end
 end
 
 EDN.register("inst") do |value|
@@ -63,3 +74,4 @@ end
 EDN.register("uuid") do |value|
   EDN::Type::UUID.new(value)
 end
+

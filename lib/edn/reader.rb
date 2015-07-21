@@ -2,6 +2,7 @@ module EDN
   class Reader
 
     def initialize(source)
+      puts Parser
       @parser = Parser.new(source)
     end
 

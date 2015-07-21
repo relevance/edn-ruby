@@ -80,8 +80,9 @@ module EDN
     end
   end
 
-  class Parser
+  class RubyEdnParser
     def initialize(source, *extra)
+      puts "New RubyEdnParser Parser"
       io = source.instance_of?(String) ? StringIO.new(source) : source
       @s = CharStream.new(io)
     end
@@ -339,5 +340,13 @@ module EDN
       @s.advance
       result
     end
+  end
+
+  Parser = RubyEdnParser
+
+  def self.parser=(p)
+    puts "Setting parser to #{p}"
+    remove_const(:Parser)
+    const_set(:Parser, p)
   end
 end
