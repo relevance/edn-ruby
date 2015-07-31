@@ -21,6 +21,11 @@ Or install it yourself as:
 
     $ gem install edn
 
+
+Note that you might also want to look at [edn_turbo](https://github.com/edporras/edn_turbo)
+which provides a much faster EDN parser (It's written in C) with an interface that is largely compatible
+with ths gem.
+
 ## Usage
 
 To read a string of EDN:
