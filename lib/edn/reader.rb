@@ -2,8 +2,7 @@ module EDN
   class Reader
 
     def initialize(source)
-      puts Parser
-      @parser = Parser.new(source)
+      @parser = EDN.new_parser(source)
     end
 
     def read(eof_value = NOTHING)

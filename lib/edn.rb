@@ -5,10 +5,9 @@ require 'edn/core_ext'
 require 'edn/types'
 require 'edn/metadata'
 require 'edn/char_stream'
+require 'edn/ruby_edn_parser'
 require 'edn/parser'
 require 'edn/reader'
-
-puts "LOcal edn"
 
 module EDN
   @tags = Hash.new
@@ -54,7 +53,7 @@ module EDN
     EDN::Type::Symbol.new(text)
   end
 
-  def self.list(*values)
+  def self.list(values)
     EDN::Type::List.new(*values)
   end
 

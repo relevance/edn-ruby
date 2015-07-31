@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe EDN::Parser do
+describe 'edn_parser' do
   include RantlyHelpers
 
-  let(:parser) { EDN::Parser.new }
+  let(:parser) { EDN.new_parser }
 
   it "can contain comments" do
     edn = ";; This is some sample data\n[1 2 ;; the first two values\n3]"
