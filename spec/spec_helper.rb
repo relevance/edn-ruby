@@ -1,6 +1,5 @@
 require 'rspec'
-#require 'edn'
-require 'edn_turbo'
+require 'edn'
 require 'rantly'
 require 'date'
 require 'time'
