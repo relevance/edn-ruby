@@ -19,70 +19,70 @@ describe EDN::CharStream do
 
   it "knows if the current char is a digit" do
     s = EDN::CharStream.new(io_for("4f"))
-    s.digit?.should be_true
+    s.digit?.should be_truthy
     s.advance
-    s.digit?.should be_false
+    s.digit?.should be_falsey
   end
 
   it "knows if the current char is an alpha" do
     s = EDN::CharStream.new(io_for("a9"))
-    s.alpha?.should be_true
+    s.alpha?.should be_truthy
     s.advance
-    s.alpha?.should be_false
+    s.alpha?.should be_falsey
   end
 
   it "knows if the current char is whitespace" do
     s = EDN::CharStream.new(io_for("a b\nc\td,"))
-    s.ws?.should be_false # a
+    s.ws?.should be_falsey # a
 
     s.advance
-    s.ws?.should be_true # " "
+    s.ws?.should be_truthy # " "
 
     s.advance
-    s.ws?.should be_false # b
+    s.ws?.should be_falsey # b
 
     s.advance
-    s.ws?.should be_true # \n
+    s.ws?.should be_truthy # \n
 
     s.advance
-    s.ws?.should be_false # c
+    s.ws?.should be_falsey # c
 
     s.advance
-    s.ws?.should be_true # \t
+    s.ws?.should be_truthy # \t
 
     s.advance
-    s.ws?.should be_false # d
+    s.ws?.should be_falsey # d
 
     s.advance
-    s.ws?.should be_true # ,
+    s.ws?.should be_truthy # ,
   end
 
   it "knows if the current char is a newline" do
     s = EDN::CharStream.new(io_for("a\nb\rc"))
-    s.newline?.should be_false # a
+    s.newline?.should be_falsey # a
 
     s.advance
-    s.newline?.should be_true # \n
+    s.newline?.should be_truthy # \n
 
     s.advance
-    s.newline?.should be_false # b
+    s.newline?.should be_falsey # b
 
     s.advance
-    s.newline?.should be_true # \r
+    s.newline?.should be_truthy # \r
 
     s.advance
-    s.newline?.should be_false # c
+    s.newline?.should be_falsey # c
   end
 
   it "knows if it is at the eof" do
     s = EDN::CharStream.new(io_for("abc"))
-    s.eof?.should be_false # a
+    s.eof?.should be_falsey # a
     s.advance
-    s.eof?.should be_false # b
+    s.eof?.should be_falsey # b
     s.advance
-    s.eof?.should be_false # c
+    s.eof?.should be_falsey # c
     s.advance
-    s.eof?.should be_true
+    s.eof?.should be_truthy
   end
 
   it "knows how to skip past a char" do
