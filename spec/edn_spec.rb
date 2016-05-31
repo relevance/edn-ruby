@@ -56,6 +56,11 @@ describe EDN do
   end
 
   context "reading data" do
+    it "treats carriage returns like whitespace" do
+      EDN.read("\r\n[\r\n]\r\n").should == []
+      EDN.read("\r[\r]\r\r").should == []
+    end
+
     it "reads any valid element" do
       elements = rant(RantlyHelpers::ELEMENT)
       elements.each do |element|

@@ -31,7 +31,7 @@ module EDN
     end
 
     def ws?(c=current)
-      /[ \t\n,]/ =~ c
+      /[ \t\r\n,]/ =~ c
     end
 
     def newline?(c=current)
