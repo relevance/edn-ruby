@@ -49,6 +49,10 @@ module EDN
     ["##{tag}", element.to_edn].join(" ")
   end
 
+  def self.keyword(text)
+    EDN::Type::Keyword.new(text)
+  end
+
   def self.symbol(text)
     EDN::Type::Symbol.new(text)
   end
