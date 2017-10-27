@@ -1,3 +1,7 @@
+# 1.2.0
+* Remove ruby Bignum
+* Drop support for ruby 1.9.*
+
 # 1.0.2
 * Handle numbers with M precision
 

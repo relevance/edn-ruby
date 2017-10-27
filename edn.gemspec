@@ -10,14 +10,15 @@ Gem::Specification.new do |gem|
   gem.license       = "MIT"
 
   gem.files         = `git ls-files`.split($\)
-  gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
-  gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
+  gem.test_files    = gem.files.grep(%r{^(spec)/})
   gem.name          = "edn"
   gem.require_paths = ["lib"]
   gem.version       = EDN::VERSION
+  gem.required_ruby_version = '>= 2.0.0'
+
 
   gem.add_development_dependency 'pry', '~> 0.9.10'
-  gem.add_development_dependency 'rspec', '~> 2.11.0'
+  gem.add_development_dependency 'rspec', '~> 2.99'
   gem.add_development_dependency 'rantly', '~> 0.3.1'
   gem.add_development_dependency 'rake', '~> 10.3'
 end
