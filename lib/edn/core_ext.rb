@@ -16,12 +16,6 @@ module EDN
       end
     end
 
-    module Bignum
-      def to_edn
-        self.to_s + 'M'
-      end
-    end
-
     module BigDecimal
       def to_edn
         self.to_s('F') + 'M'
@@ -90,11 +84,11 @@ module EDN
         EDN.tagout("inst", self.xmlschema)
       end
     end
+
   end
 end
 
 Numeric.send(:include, EDN::CoreExt::Unquoted)
-Bignum.send(:include, EDN::CoreExt::Bignum)
 BigDecimal.send(:include, EDN::CoreExt::BigDecimal)
 TrueClass.send(:include, EDN::CoreExt::Unquoted)
 FalseClass.send(:include, EDN::CoreExt::Unquoted)
