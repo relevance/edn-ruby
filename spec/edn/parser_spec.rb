@@ -7,32 +7,32 @@ describe 'edn_parser' do
 
   it "can contain comments" do
     edn = ";; This is some sample data\n[1 2 ;; the first two values\n3]"
-    EDN.read(edn).should == [1, 2, 3]
+    expect(EDN.read(edn)).to eq([1, 2, 3])
   end
 
   it "can discard using the discard reader macro" do
-    edn = "[1 2 #_3 {:foo #_bar :baz}]"
-    EDN.read(edn).should == [1, 2, {:foo => :baz}]
+    edn = '[1 2 #_3 {:foo #_bar :baz}]'
+    expect(EDN.read(edn)).to eq([1, 2, {:foo => :baz}])
   end
 
   context "element" do
     it "should consume metadata with the element" do
       x = EDN.read('^{:doc "test"} [1 2]')
-      x.should == [1, 2]
-      x.metadata.should == {doc: "test"}
+      expect(x).to eq([1, 2])
+      expect(x.metadata).to eq({doc: 'test'})
     end
   end
 
   context "integer" do
     it "should consume integers" do
       rant(RantlyHelpers::INTEGER).each do |int|
-        (EDN.read int.to_s).should == int.to_i
+        expect((EDN.read int.to_s)).to eq(int.to_i)
       end
     end
 
     it "should consume integers prefixed with a +" do
       rant(RantlyHelpers::INTEGER).each do |int|
-        (EDN.read "+#{int.to_i.abs.to_s}").should == int.to_i.abs
+        expect((EDN.read "+#{int.to_i.abs.to_s}")).to eq(int.to_i.abs)
       end
     end
   end
@@ -40,19 +40,19 @@ describe 'edn_parser' do
   context "float" do
     it "should consume simple floats" do
       rant(RantlyHelpers::FLOAT).each do |float|
-        EDN.read(float.to_s).should == float.to_f
+        expect(EDN.read(float.to_s)).to eq(float.to_f)
       end
     end
 
     it "should consume floats with exponents" do
       rant(RantlyHelpers::FLOAT_WITH_EXP).each do |float|
-        EDN.read(float.to_s).should == float.to_f
+        expect(EDN.read(float.to_s)).to eq(float.to_f)
       end
     end
 
     it "should consume floats prefixed with a +" do
       rant(RantlyHelpers::FLOAT).each do |float|
-        EDN.read("+#{float.to_f.abs.to_s}").should == float.to_f.abs
+        expect(EDN.read("+#{float.to_f.abs.to_s}")).to eq(float.to_f.abs)
       end
     end
   end
@@ -60,15 +60,15 @@ describe 'edn_parser' do
   context "symbol" do
     context "special cases" do
       it "should consume '/'" do
-        EDN.read('/').should == EDN::Type::Symbol.new(:"/")
+        expect(EDN.read('/')).to eq(EDN::Type::Symbol.new(:'/'))
       end
 
       it "should consume '.'" do
-        EDN.read('.').should == EDN::Type::Symbol.new(:".")
+        expect(EDN.read('.')).to eq(EDN::Type::Symbol.new(:'.'))
       end
 
       it "should consume '-'" do
-        EDN.read('-').should == EDN::Type::Symbol.new(:"-")
+        expect(EDN.read('-')).to eq(EDN::Type::Symbol.new(:'-'))
       end
     end
   end
@@ -76,7 +76,7 @@ describe 'edn_parser' do
   context "keyword" do
     it "should consume any keywords" do
       rant(RantlyHelpers::SYMBOL).each do |symbol|
-        EDN.read(":#{symbol}").should == symbol.to_sym
+        expect(EDN.read(":#{symbol}")).to eq(symbol.to_sym)
       end
     end
   end
@@ -84,7 +84,7 @@ describe 'edn_parser' do
   context "string" do
     it "should consume any string" do
       rant(RantlyHelpers::RUBY_STRING).each do |string|
-        EDN.read(string.to_edn).should == string
+        expect(EDN.read(string.to_edn)).to eq(string)
       end
     end
   end
@@ -92,15 +92,15 @@ describe 'edn_parser' do
   context "character" do
     it "should consume any character" do
       rant(RantlyHelpers::RUBY_CHAR).each do |char|
-        EDN.read(char.to_edn).should == char
+        expect(EDN.read(char.to_edn)).to eq(char)
       end
     end
   end
 
   context "vector" do
     it "should consume an empty vector" do
-      EDN.read('[]').should == []
-      EDN.read('[  ]').should == []
+      expect(EDN.read('[]')).to eq([])
+      expect(EDN.read('[  ]')).to eq([])
     end
 
     it "should consume vectors of mixed elements" do
@@ -112,8 +112,8 @@ describe 'edn_parser' do
 
   context "list" do
     it "should consume an empty list" do
-      EDN.read('()').should == []
-      EDN.read('( )').should == []
+      expect(EDN.read('()')).to eq([])
+      expect(EDN.read('( )')).to eq([])
     end
 
     it "should consume lists of mixed elements" do
@@ -125,8 +125,8 @@ describe 'edn_parser' do
 
   context "set" do
     it "should consume an empty set" do
-      EDN.read('#{}').should == Set.new
-      EDN.read('#{ }').should == Set.new
+      expect(EDN.read('#{}')).to eq(Set.new)
+      expect(EDN.read('#{ }')).to eq(Set.new)
     end
 
     it "should consume sets of mixed elements" do
