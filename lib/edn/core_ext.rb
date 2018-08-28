@@ -16,9 +16,11 @@ module EDN
       end
     end
 
-    module Bignum
-      def to_edn
-        self.to_s + 'M'
+    if if 1.class != Integer
+      module Bignum
+        def to_edn
+          self.to_s + 'M'
+        end
       end
     end
 
@@ -94,7 +96,7 @@ module EDN
 end
 
 Numeric.send(:include, EDN::CoreExt::Unquoted)
-Bignum.send(:include, EDN::CoreExt::Bignum)
+Bignum.send(:include, EDN::CoreExt::Bignum) if 1.class != Integer
 BigDecimal.send(:include, EDN::CoreExt::BigDecimal)
 TrueClass.send(:include, EDN::CoreExt::Unquoted)
 FalseClass.send(:include, EDN::CoreExt::Unquoted)
