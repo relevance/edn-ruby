@@ -1,5 +1,6 @@
 module EDN
   class Reader
+    include Enumerable
 
     def initialize(source)
       @parser = EDN.new_parser(source)
