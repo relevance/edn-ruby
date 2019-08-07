@@ -20,5 +20,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'pry', '~> 0.9.10'
   gem.add_development_dependency 'rake', '~> 10.3'
   gem.add_development_dependency 'rantly', '~> 0.3.1'
-  gem.add_development_dependency 'rspec', '~> 2.11.0'
+  gem.add_development_dependency 'rspec', '~> 3.8'
 end

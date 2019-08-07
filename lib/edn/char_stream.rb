@@ -1,41 +1,45 @@
+# frozen_string_literal: true
+
 require 'stringio'
 require 'set'
 
 module EDN
   class CharStream
-    def initialize(io=$stdin)
+    def initialize(io = $stdin)
       @io = io
       @current = nil
     end
 
     def current
       return @current if @current
+
       advance
     end
 
     def advance
       return @current if @current == :eof
+
       @current = @io.getc || :eof
     end
 
-    def digit?(c=current)
+    def digit?(c = current)
       /[0-9]/.match?(c)
     end
 
-    def alpha?(c=current)
+    def alpha?(c = current)
       /[a-zA-Z]/.match?(c)
     end
 
-    def eof?(c=current)
+    def eof?(c = current)
       c == :eof
     end
 
-    def ws?(c=current)
-      /[ \t\r\n,]/ =~ c
+    def ws?(c = current)
+      /[ \t\r\n,]/.match?(c)
     end
 
-    def newline?(c=current)
-      /[\n\r]/ =~ c
+    def newline?(c = current)
+      /[\n\r]/.match?(c)
     end
 
     def repeat(pattern, &block)
@@ -53,7 +57,7 @@ module EDN
       end
     end
 
-    def skip_past(expected, error_message=nil)
+    def skip_past(expected, error_message = nil)
       if current == expected
         advance
         return expected
@@ -64,9 +68,7 @@ module EDN
     end
 
     def skip_to_eol
-      until current == :eof || newline?
-        advance
-      end
+      advance until current == :eof || newline?
     end
 
     def skip_ws
