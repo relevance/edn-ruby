@@ -1,0 +1,146 @@
+version: 2.1
+
+commands:
+  login_to_artifactory:
+    description: Login to Artifactory
+    steps:
+      - run:
+          name: Login to Artifactory
+          command: |
+            mkdir -p ~/.gem
+            curl -u "$ARTIFACTORY_USER":"$ARTIFACTORY_PASSWORD" https://fundingcircle.jfrog.io/fundingcircle/api/gems/rubygems/api/v1/api_key.yaml > ~/.gem/credentials
+            chmod 600 ~/.gem/credentials
+  push_gem_to_artifactory:
+    description: Push gem to Artifactory
+    parameters:
+      repository:
+        type: string
+        default: "does not exist"
+    steps:
+      - run:
+          name: Push gem to Artifactory
+          command: |
+            package=$(ls -t1 ${CIRCLE_PROJECT_REPONAME}*.gem | head -1)
+            gem push $package --host https://fundingcircle.jfrog.io/fundingcircle/api/gems/<< parameters.repository >>
+
+executors:
+  ruby:
+    docker:
+      - image: circleci/ruby:<< parameters.tag >>
+    parameters:
+      tag:
+        type: string
+        default: latest
+    working_directory: ~/edn_ruby
+
+jobs:
+  build:
+    parameters:
+      tag:
+        type: string
+        default: latest
+    executor:
+      name: ruby
+      tag: << parameters.tag >>
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - edn_ruby-<< parameters.tag >>-{{ checksum "edn.gemspec" }}
+      - run:
+          name: Install gems
+          command: bundle check --path=vendor/bundle || bundle install --path=vendor/bundle --jobs=4 --retry=3
+      - save_cache:
+          key: edn_ruby-<< parameters.tag >>-{{ checksum "edn.gemspec" }}
+          paths:
+            - vendor/bundle
+      - run:
+          name: Run tests
+          command: bundle exec rspec --color --format progress spec
+  publish-feature-branch-gem:
+    executor:
+      name: ruby
+      tag: latest
+    steps:
+      - checkout
+      - run:
+          name: Install gem-versioner
+          command: gem install gem-versioner
+      - run:
+          name: Build gem
+          command: PRE_RELEASE=$CIRCLE_BRANCH gem build "$CIRCLE_PROJECT_REPONAME".gemspec
+      - login_to_artifactory
+      - push_gem_to_artifactory:
+          repository: "rubygems-pre-releases"
+  publish-tagged-gem:
+    executor:
+      name: ruby
+      tag: latest
+    steps:
+      - checkout
+      - run:
+          name: Build gem
+          command: gem build "$CIRCLE_PROJECT_REPONAME".gemspec
+      - login_to_artifactory
+      - push_gem_to_artifactory:
+          repository: "rubygems-local"
+
+workflows:
+  test-and-publish:
+    jobs:
+      - build:
+          name: ruby23
+          tag: "2.3"
+          filters:
+            tags:
+              only: /.*/
+      - build:
+          name: ruby24
+          tag: "2.4"
+          filters:
+            tags:
+              only: /.*/
+      - build:
+          name: ruby25
+          tag: "2.5"
+          filters:
+            tags:
+              only: /.*/
+      - build:
+          name: ruby26
+          tag: "2.6"
+          filters:
+            tags:
+              only: /.*/
+      - build:
+          name: rubylatest
+          tag: "latest"
+          filters:
+            tags:
+              only: /.*/
+      - publish-feature-branch-gem:
+          context: org-global
+          filters:
+            branches:
+              ignore: master
+            tags:
+              ignore: /.*/
+          requires:
+            - ruby23
+            - ruby24
+            - ruby25
+            - ruby26
+            - rubylatest
+      - publish-tagged-gem:
+          context: org-global
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v[0-9]+(\.[0-9]+)*$/
+          requires:
+            - ruby23
+            - ruby24
+            - ruby25
+            - ruby26
+            - rubylatest
