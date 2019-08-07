@@ -19,11 +19,11 @@ module EDN
     end
 
     def digit?(c=current)
-      /[0-9]/ =~ c
+      /[0-9]/.match?(c)
     end
 
     def alpha?(c=current)
-      /[a-zA-Z]/ =~ c
+      /[a-zA-Z]/.match?(c)
     end
 
     def eof?(c=current)
