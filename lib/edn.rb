@@ -62,7 +62,7 @@ module EDN
   end
 
   def self.big_decimal(str)
-    BigDecimal.new(str)
+    BigDecimal(str)
   end
 end
 
