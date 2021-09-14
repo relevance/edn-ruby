@@ -24,7 +24,7 @@ module EDN
 
     module Bignum
       def to_edn
-        self.to_s + 'M'
+        self.to_s + 'N'
       end
     end
 
