@@ -15,6 +15,12 @@ module EDN
         true
       end
     end
+    
+    module Integer
+      def to_edn
+        self.to_s + 'N'
+      end
+    end
 
     module Bignum
       def to_edn
