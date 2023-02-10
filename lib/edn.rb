@@ -61,8 +61,12 @@ module EDN
     Set.new(*elems)
   end
 
+  def self.rational(value)
+    Rational(value)
+  end
+  
   def self.big_decimal(str)
-    BigDecimal.new(str)
+    BigDecimal(str)
   end
 end
 
